@@ -1,1 +1,1 @@
-// stub — implemented in subsequent tasks
+// pipeline is header-only (template); this TU keeps the static target.

@@ -1,1 +1,1 @@
-// stub — implemented in subsequent tasks
+// query_bus is header-only (template); this TU keeps the static target.
