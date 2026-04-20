@@ -2,6 +2,7 @@
 #include <array>
 #include <cstdint>
 #include <format>
+#include <functional>
 #include <random>
 #include <string>
 
@@ -27,6 +28,9 @@ public:
             static_cast<uint16_t>(lo_ >> 48),
             lo_ & 0x0000FFFFFFFFFFFFULL);
     }
+
+    [[nodiscard]] uint64_t hi() const noexcept { return hi_; }
+    [[nodiscard]] uint64_t lo() const noexcept { return lo_; }
 
     bool operator==(const UUID&) const = default;
     bool operator<(const UUID& o)  const { return hi_ != o.hi_ ? hi_ < o.hi_ : lo_ < o.lo_; }
@@ -64,3 +68,20 @@ using TenantId      = StrongId<TenantIdTag>;
 using RequestId     = StrongId<RequestIdTag>;
 
 } // namespace cpp_commons::kernel
+
+// std::hash specializations — enable use in unordered_map/unordered_set
+template<>
+struct std::hash<cpp_commons::kernel::UUID> {
+    std::size_t operator()(const cpp_commons::kernel::UUID& u) const noexcept {
+        // Knuth multiplicative hash combiner — better distribution than plain XOR
+        return std::hash<uint64_t>{}(u.hi()) ^
+               (std::hash<uint64_t>{}(u.lo()) * 0x9e3779b97f4a7c15ULL);
+    }
+};
+
+template<typename Tag>
+struct std::hash<cpp_commons::kernel::StrongId<Tag>> {
+    std::size_t operator()(const cpp_commons::kernel::StrongId<Tag>& id) const noexcept {
+        return std::hash<cpp_commons::kernel::UUID>{}(id.uuid());
+    }
+};

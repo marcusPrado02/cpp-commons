@@ -1,5 +1,6 @@
 #include <cpp_commons/kernel/identity.hpp>
 #include <gtest/gtest.h>
+#include <unordered_map>
 
 using namespace cpp_commons::kernel;
 
@@ -40,4 +41,38 @@ TEST(StrongIdTest, TypesAreDistinct) {
     EntityId      eid;
     CorrelationId cid;
     EXPECT_NE(eid.to_string(), cid.to_string());  // different UUIDs
+}
+
+// ── std::hash ────────────────────────────────────────────────────────────────
+
+TEST(UUIDHashTest, EqualUUIDsHaveSameHash) {
+    auto uuid = UUID::generate();
+    EXPECT_EQ(std::hash<UUID>{}(uuid), std::hash<UUID>{}(uuid));
+}
+
+TEST(UUIDHashTest, DifferentUUIDsLikelyDifferentHash) {
+    auto a = UUID::generate();
+    auto b = UUID::generate();
+    // Collision possible but astronomically unlikely with UUID v4
+    EXPECT_NE(std::hash<UUID>{}(a), std::hash<UUID>{}(b));
+}
+
+TEST(UUIDHashTest, UsableInUnorderedMap) {
+    std::unordered_map<UUID, int> m;
+    auto uuid = UUID::generate();
+    m[uuid] = 42;
+    EXPECT_EQ(m.at(uuid), 42);
+}
+
+TEST(StrongIdHashTest, UsableInUnorderedMap) {
+    std::unordered_map<EntityId, std::string> m;
+    EntityId id;
+    m[id] = "hello";
+    EXPECT_EQ(m.at(id), "hello");
+}
+
+TEST(StrongIdHashTest, EqualIdsHaveSameHash) {
+    auto uuid = UUID::generate();
+    EntityId a{uuid}, b{uuid};
+    EXPECT_EQ(std::hash<EntityId>{}(a), std::hash<EntityId>{}(b));
 }
