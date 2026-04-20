@@ -63,6 +63,12 @@ FetchContent_Declare(jwt_cpp
     GIT_SHALLOW    TRUE
 )
 
+FetchContent_Declare(googlebenchmark
+    GIT_REPOSITORY https://github.com/google/benchmark.git
+    GIT_TAG        v1.8.3
+    GIT_SHALLOW    TRUE
+)
+
 # Make available (only what we need now; others added per module)
 FetchContent_MakeAvailable(tl_expected nlohmann_json)
 
@@ -140,6 +146,15 @@ if(CPP_COMMONS_BUILD_TESTS)
     )
 
     add_subdirectory(tests)
+endif()
+
+# ── Benchmarks ────────────────────────────────────────────────────────────────
+
+if(CPP_COMMONS_BUILD_BENCHMARKS)
+    set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+    set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+    FetchContent_MakeAvailable(googlebenchmark)
+    add_subdirectory(tests/benchmarks)
 endif()
 
 # ── Examples ──────────────────────────────────────────────────────────────────
