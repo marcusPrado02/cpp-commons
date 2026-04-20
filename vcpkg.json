@@ -1,0 +1,16 @@
+{
+  "name": "cpp-commons",
+  "version": "0.1.0",
+  "dependencies": [
+    "tl-expected",
+    "asio",
+    "spdlog",
+    "nlohmann-json",
+    "openssl",
+    "jwt-cpp",
+    "abseil",
+    "fmt",
+    "gtest",
+    "benchmark"
+  ]
+}

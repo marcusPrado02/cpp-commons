@@ -1,0 +1,9 @@
+build/
+.cache/
+vcpkg_installed/
+*.o
+*.a
+*.so
+*.dylib
+CMakeUserPresets.json
+.DS_Store

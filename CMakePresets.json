@@ -1,0 +1,82 @@
+{
+  "version": 6,
+  "configurePresets": [
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_MODE": "ON"
+      }
+    },
+    {
+      "name": "dev",
+      "displayName": "Development (Debug + ASan + clang-tidy)",
+      "inherits": "vcpkg-base",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/dev",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE":              "Debug",
+        "CPP_COMMONS_BUILD_TESTS":       "ON",
+        "CPP_COMMONS_BUILD_EXAMPLES":    "ON",
+        "CPP_COMMONS_ENABLE_SANITIZERS": "address",
+        "CPP_COMMONS_ENABLE_CLANG_TIDY": "ON"
+      }
+    },
+    {
+      "name": "ci",
+      "displayName": "CI (Release + UBSan + coverage)",
+      "inherits": "vcpkg-base",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/ci",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE":              "Release",
+        "CPP_COMMONS_BUILD_TESTS":       "ON",
+        "CPP_COMMONS_ENABLE_SANITIZERS": "address"
+      }
+    },
+    {
+      "name": "release",
+      "displayName": "Release (optimized)",
+      "inherits": "vcpkg-base",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE":           "Release",
+        "CPP_COMMONS_BUILD_TESTS":    "OFF",
+        "CPP_COMMONS_BUILD_EXAMPLES": "OFF"
+      }
+    },
+    {
+      "name": "benchmark",
+      "displayName": "Benchmark (Release + perf)",
+      "inherits": "vcpkg-base",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/benchmark",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE":               "Release",
+        "CPP_COMMONS_BUILD_BENCHMARKS":   "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    { "name": "dev",       "configurePreset": "dev"       },
+    { "name": "ci",        "configurePreset": "ci"        },
+    { "name": "release",   "configurePreset": "release"   },
+    { "name": "benchmark", "configurePreset": "benchmark" }
+  ],
+  "testPresets": [
+    {
+      "name": "dev",
+      "configurePreset": "dev",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error" }
+    },
+    {
+      "name": "ci",
+      "configurePreset": "ci",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error" }
+    }
+  ]
+}

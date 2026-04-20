@@ -1,0 +1,8 @@
+add_subdirectory(kernel)
+add_subdirectory(errors)
+add_subdirectory(config)
+add_subdirectory(observability)
+add_subdirectory(resilience)
+add_subdirectory(application)
+add_subdirectory(web)
+add_subdirectory(security)
