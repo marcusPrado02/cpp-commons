@@ -16,7 +16,9 @@ target_include_directories(cpp_commons_security PUBLIC
 target_link_libraries(cpp_commons_security PUBLIC
     cpp_commons::kernel
     cpp_commons::errors
-    OpenSSL::SSL
-    OpenSSL::Crypto
-    jwt-cpp::jwt-cpp
 )
+
+if(OpenSSL_FOUND)
+    target_link_libraries(cpp_commons_security PUBLIC OpenSSL::SSL OpenSSL::Crypto)
+    target_compile_definitions(cpp_commons_security PUBLIC CPP_COMMONS_HAS_OPENSSL)
+endif()

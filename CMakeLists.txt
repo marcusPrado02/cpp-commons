@@ -23,14 +23,66 @@ include(cmake/CompilerWarnings.cmake)
 include(cmake/Sanitizers.cmake)
 include(cmake/StaticAnalysis.cmake)
 
-# Dependencies via vcpkg
-find_package(tl-expected CONFIG REQUIRED)
-find_package(asio         CONFIG REQUIRED)
-find_package(spdlog       CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
-find_package(OpenSSL      REQUIRED)
-find_package(jwt-cpp      CONFIG REQUIRED)
-find_package(absl         CONFIG REQUIRED)
+# ── Dependencies via FetchContent ─────────────────────────────────────────────
+include(FetchContent)
+set(FETCHCONTENT_QUIET OFF)
+
+FetchContent_Declare(tl_expected
+    GIT_REPOSITORY https://github.com/TartanLlama/expected.git
+    GIT_TAG        v1.1.0
+    GIT_SHALLOW    TRUE
+)
+
+FetchContent_Declare(asio
+    GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+    GIT_TAG        asio-1-28-1
+    GIT_SHALLOW    TRUE
+)
+
+FetchContent_Declare(spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG        v1.14.1
+    GIT_SHALLOW    TRUE
+)
+
+FetchContent_Declare(nlohmann_json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+    GIT_SHALLOW    TRUE
+)
+
+FetchContent_Declare(googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG        v1.14.0
+    GIT_SHALLOW    TRUE
+)
+
+FetchContent_Declare(jwt_cpp
+    GIT_REPOSITORY https://github.com/Thalhammer/jwt-cpp.git
+    GIT_TAG        v0.7.0
+    GIT_SHALLOW    TRUE
+)
+
+# Make available (only what we need now; others added per module)
+FetchContent_MakeAvailable(tl_expected nlohmann_json)
+
+# Asio: header-only, no CMake install target — wire manually
+FetchContent_MakeAvailable(asio)
+add_library(asio_interface INTERFACE)
+add_library(asio::asio ALIAS asio_interface)
+target_include_directories(asio_interface INTERFACE
+    ${asio_SOURCE_DIR}/asio/include
+)
+target_compile_definitions(asio_interface INTERFACE
+    ASIO_STANDALONE
+    ASIO_NO_DEPRECATED
+)
+
+# spdlog
+FetchContent_MakeAvailable(spdlog)
+
+# OpenSSL (system)
+find_package(OpenSSL QUIET)
 
 # ── INTERFACE (header-only) targets ──────────────────────────────────────────
 
@@ -41,7 +93,8 @@ target_include_directories(cpp_commons_kernel INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(cpp_commons_kernel INTERFACE
-    tl-expected::tl-expected
+    tl::expected
+    asio::asio
 )
 target_compile_features(cpp_commons_kernel INTERFACE cxx_std_20)
 target_link_libraries(cpp_commons_kernel INTERFACE cpp_commons_warnings)
@@ -69,8 +122,9 @@ add_subdirectory(src/security)
 # ── Tests ─────────────────────────────────────────────────────────────────────
 
 if(CPP_COMMONS_BUILD_TESTS)
-    find_package(GTest CONFIG REQUIRED)
+    FetchContent_MakeAvailable(googletest)
     enable_testing()
+    include(GoogleTest)
 
     add_library(cpp_commons_testing INTERFACE)
     add_library(cpp_commons::testing ALIAS cpp_commons_testing)
@@ -93,45 +147,3 @@ endif()
 if(CPP_COMMONS_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
-
-# ── Install ───────────────────────────────────────────────────────────────────
-
-include(GNUInstallDirs)
-include(CMakePackageConfigHelpers)
-
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
-
-install(TARGETS
-    cpp_commons_kernel
-    cpp_commons_errors
-    cpp_commons_config
-    cpp_commons_observability
-    cpp_commons_resilience
-    cpp_commons_application
-    cpp_commons_web
-    cpp_commons_security
-    EXPORT CppCommonsTargets
-)
-
-install(EXPORT CppCommonsTargets
-    NAMESPACE cpp_commons::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
-)
-
-configure_package_config_file(
-    cmake/CppCommonsConfig.cmake.in
-    "${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
-)
-
-write_basic_package_version_file(
-    "${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfigVersion.cmake"
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
-
-install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfigVersion.cmake"
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
-)
