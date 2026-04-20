@@ -1,1 +1,1 @@
-// stub — implemented in subsequent tasks
+// middleware_chain is header-only; this TU keeps the static target.

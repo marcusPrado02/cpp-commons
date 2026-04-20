@@ -1,4 +1,16 @@
-# Tests for web — sources added as each module is implemented
-if(FALSE)
-    add_executable(web_tests placeholder.cpp)
-endif()
+add_executable(web_tests
+    http_test.cpp
+)
+
+target_include_directories(web_tests PRIVATE
+    ${CMAKE_SOURCE_DIR}/src/web
+    ${CMAKE_SOURCE_DIR}/include
+)
+
+target_link_libraries(web_tests PRIVATE
+    cpp_commons::web
+    cpp_commons::errors
+    GTest::gtest_main
+)
+
+gtest_discover_tests(web_tests)
