@@ -1,4 +1,5 @@
 #pragma once
+#include "error_codes.hpp"
 #include <nlohmann/json.hpp>
 #include <string>
 
@@ -22,19 +23,24 @@ struct ProblemDetails {
     }
 
     static ProblemDetails not_found(std::string detail) {
-        return {"about:blank", "Not Found", 404, std::move(detail), ""};
+        return {std::string{error_type::not_found}, "Not Found",
+                http_status::not_found, std::move(detail), ""};
     }
     static ProblemDetails conflict(std::string detail) {
-        return {"about:blank", "Conflict", 409, std::move(detail), ""};
+        return {std::string{error_type::conflict}, "Conflict",
+                http_status::conflict, std::move(detail), ""};
     }
     static ProblemDetails validation_error(std::string detail) {
-        return {"about:blank", "Unprocessable Entity", 422, std::move(detail), ""};
+        return {std::string{error_type::validation}, "Unprocessable Entity",
+                http_status::unprocessable_entity, std::move(detail), ""};
     }
     static ProblemDetails unauthorized() {
-        return {"about:blank", "Unauthorized", 401, "Authentication required", ""};
+        return {std::string{error_type::unauthorized}, "Unauthorized",
+                http_status::unauthorized, "Authentication required", ""};
     }
     static ProblemDetails internal_error() {
-        return {"about:blank", "Internal Server Error", 500, "An unexpected error occurred", ""};
+        return {std::string{error_type::internal}, "Internal Server Error",
+                http_status::internal_server_error, "An unexpected error occurred", ""};
     }
 };
 
