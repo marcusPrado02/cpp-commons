@@ -77,7 +77,8 @@ FetchContent_MakeAvailable(asio)
 add_library(asio_interface INTERFACE)
 add_library(asio::asio ALIAS asio_interface)
 target_include_directories(asio_interface INTERFACE
-    ${asio_SOURCE_DIR}/asio/include
+    $<BUILD_INTERFACE:${asio_SOURCE_DIR}/asio/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 target_compile_definitions(asio_interface INTERFACE
     ASIO_STANDALONE
@@ -99,11 +100,11 @@ target_include_directories(cpp_commons_kernel INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 target_link_libraries(cpp_commons_kernel INTERFACE
-    tl::expected
-    asio::asio
+    $<BUILD_INTERFACE:tl::expected>
+    $<BUILD_INTERFACE:asio::asio>
+    $<BUILD_INTERFACE:cpp_commons_warnings>
 )
 target_compile_features(cpp_commons_kernel INTERFACE cxx_std_20)
-target_link_libraries(cpp_commons_kernel INTERFACE cpp_commons_warnings)
 
 add_library(cpp_commons_errors INTERFACE)
 add_library(cpp_commons::errors ALIAS cpp_commons_errors)
@@ -113,7 +114,7 @@ target_include_directories(cpp_commons_errors INTERFACE
 )
 target_link_libraries(cpp_commons_errors INTERFACE
     cpp_commons::kernel
-    nlohmann_json::nlohmann_json
+    $<BUILD_INTERFACE:nlohmann_json::nlohmann_json>
 )
 
 # ── Compiled targets ──────────────────────────────────────────────────────────
@@ -162,3 +163,70 @@ endif()
 if(CPP_COMMONS_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+# ── Install & package config ──────────────────────────────────────────────────
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
+install(TARGETS
+        cpp_commons_kernel
+        cpp_commons_errors
+        cpp_commons_config
+        cpp_commons_observability
+        cpp_commons_resilience
+        cpp_commons_application
+        cpp_commons_web
+        cpp_commons_security
+        # Bundled FetchContent deps
+        expected          # tl::expected
+        nlohmann_json     # nlohmann_json::nlohmann_json
+        spdlog            # spdlog::spdlog
+        asio_interface    # asio::asio
+    EXPORT CppCommonsTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+# Vendored dep headers
+install(DIRECTORY ${tl_expected_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(DIRECTORY ${nlohmann_json_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(DIRECTORY ${spdlog_SOURCE_DIR}/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+install(DIRECTORY ${asio_SOURCE_DIR}/asio/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
+
+install(EXPORT CppCommonsTargets
+    FILE      CppCommonsTargets.cmake
+    NAMESPACE cpp_commons::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
+)
+
+configure_package_config_file(
+    cmake/CppCommonsConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
+)
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfigVersion.cmake
+    VERSION       ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
+)

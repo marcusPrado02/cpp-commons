@@ -12,11 +12,13 @@ target_include_directories(cpp_commons_observability PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cpp_commons_observability PUBLIC
-    cpp_commons::kernel
-    cpp_commons::errors
-    cpp_commons::config
-    spdlog::spdlog
-    asio::asio
-    nlohmann_json::nlohmann_json
+target_link_libraries(cpp_commons_observability
+    PUBLIC
+        cpp_commons::kernel
+        cpp_commons::errors
+        cpp_commons::config
+        spdlog::spdlog
+        nlohmann_json::nlohmann_json
+    PRIVATE
+        asio::asio
 )

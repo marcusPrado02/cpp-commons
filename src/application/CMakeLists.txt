@@ -13,10 +13,12 @@ target_include_directories(cpp_commons_application PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cpp_commons_application PUBLIC
-    cpp_commons::kernel
-    cpp_commons::errors
-    cpp_commons::observability
-    cpp_commons::resilience
-    asio::asio
+target_link_libraries(cpp_commons_application
+    PUBLIC
+        cpp_commons::kernel
+        cpp_commons::errors
+        cpp_commons::observability
+        cpp_commons::resilience
+    PRIVATE
+        asio::asio
 )

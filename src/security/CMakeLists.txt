@@ -13,10 +13,12 @@ target_include_directories(cpp_commons_security PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cpp_commons_security PUBLIC
-    cpp_commons::kernel
-    cpp_commons::errors
-    nlohmann_json::nlohmann_json
+target_link_libraries(cpp_commons_security
+    PUBLIC
+        cpp_commons::kernel
+        cpp_commons::errors
+    PRIVATE
+        nlohmann_json::nlohmann_json
 )
 
 if(OpenSSL_FOUND)

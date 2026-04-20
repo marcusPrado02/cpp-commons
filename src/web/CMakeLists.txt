@@ -12,10 +12,12 @@ target_include_directories(cpp_commons_web PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cpp_commons_web PUBLIC
-    cpp_commons::kernel
-    cpp_commons::errors
-    cpp_commons::application
-    nlohmann_json::nlohmann_json
-    asio::asio
+target_link_libraries(cpp_commons_web
+    PUBLIC
+        cpp_commons::kernel
+        cpp_commons::errors
+        cpp_commons::application
+    PRIVATE
+        nlohmann_json::nlohmann_json
+        asio::asio
 )

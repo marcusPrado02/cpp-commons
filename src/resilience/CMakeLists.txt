@@ -13,9 +13,11 @@ target_include_directories(cpp_commons_resilience PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 
-target_link_libraries(cpp_commons_resilience PUBLIC
-    cpp_commons::kernel
-    cpp_commons::errors
-    cpp_commons::observability
-    asio::asio
+target_link_libraries(cpp_commons_resilience
+    PUBLIC
+        cpp_commons::kernel
+        cpp_commons::errors
+        cpp_commons::observability
+    PRIVATE
+        asio::asio
 )
