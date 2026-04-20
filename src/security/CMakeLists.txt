@@ -16,6 +16,7 @@ target_include_directories(cpp_commons_security PUBLIC
 target_link_libraries(cpp_commons_security PUBLIC
     cpp_commons::kernel
     cpp_commons::errors
+    nlohmann_json::nlohmann_json
 )
 
 if(OpenSSL_FOUND)
