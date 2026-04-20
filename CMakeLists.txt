@@ -76,7 +76,7 @@ FetchContent_MakeAvailable(tl_expected nlohmann_json)
 FetchContent_MakeAvailable(asio)
 add_library(asio_interface INTERFACE)
 add_library(asio::asio ALIAS asio_interface)
-target_include_directories(asio_interface INTERFACE
+target_include_directories(asio_interface SYSTEM INTERFACE
     $<BUILD_INTERFACE:${asio_SOURCE_DIR}/asio/include>
     $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )

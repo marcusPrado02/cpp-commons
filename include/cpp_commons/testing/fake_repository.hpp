@@ -1,13 +1,13 @@
 #pragma once
 #include <cpp_commons/kernel/ports/repository_port.hpp>
+#include <map>
 #include <optional>
-#include <unordered_map>
 #include <stdexcept>
 
 namespace cpp_commons::testing {
 
-// In-memory repository for use in unit tests.
-// TId must be hashable (provide std::hash<TId> or use a string-based ID).
+// In-memory repository for unit tests.
+// TId must satisfy operator< (satisfied by StrongId and most ID types).
 template <typename T, typename TId>
 class FakeRepository {
 public:
@@ -30,7 +30,7 @@ public:
     void clear() noexcept { store_.clear(); }
 
 private:
-    std::unordered_map<TId, T> store_;
+    std::map<TId, T> store_;
 };
 
 } // namespace cpp_commons::testing

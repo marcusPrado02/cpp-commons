@@ -2,18 +2,15 @@
   "version": 6,
   "configurePresets": [
     {
-      "name": "vcpkg-base",
+      "name": "base",
       "hidden": true,
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-      "cacheVariables": {
-        "VCPKG_MANIFEST_MODE": "ON"
-      }
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}"
     },
     {
       "name": "dev",
       "displayName": "Development (Debug + ASan + clang-tidy)",
-      "inherits": "vcpkg-base",
-      "generator": "Ninja",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build/dev",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE":              "Debug",
@@ -25,9 +22,8 @@
     },
     {
       "name": "ci",
-      "displayName": "CI (Release + UBSan + coverage)",
-      "inherits": "vcpkg-base",
-      "generator": "Ninja",
+      "displayName": "CI (Release + UBSan + tests)",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build/ci",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE":              "Release",
@@ -38,8 +34,7 @@
     {
       "name": "release",
       "displayName": "Release (optimized)",
-      "inherits": "vcpkg-base",
-      "generator": "Ninja",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build/release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE":           "Release",
@@ -50,12 +45,11 @@
     {
       "name": "benchmark",
       "displayName": "Benchmark (Release + perf)",
-      "inherits": "vcpkg-base",
-      "generator": "Ninja",
+      "inherits": "base",
       "binaryDir": "${sourceDir}/build/benchmark",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE":               "Release",
-        "CPP_COMMONS_BUILD_BENCHMARKS":   "ON"
+        "CMAKE_BUILD_TYPE":             "Release",
+        "CPP_COMMONS_BUILD_BENCHMARKS": "ON"
       }
     }
   ],

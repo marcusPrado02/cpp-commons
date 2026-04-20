@@ -1,5 +1,6 @@
 add_executable(testing_extras_tests
     testing_extras_test.cpp
+    fake_implementations_test.cpp
 )
 
 target_include_directories(testing_extras_tests PRIVATE

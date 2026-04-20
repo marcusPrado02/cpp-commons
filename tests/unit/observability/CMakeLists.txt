@@ -1,6 +1,7 @@
 add_executable(observability_tests
     correlation_context_test.cpp
     health_registry_test.cpp
+    context_aware_executor_test.cpp
 )
 
 target_include_directories(observability_tests PRIVATE
