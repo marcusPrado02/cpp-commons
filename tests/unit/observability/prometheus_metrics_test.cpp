@@ -70,7 +70,6 @@ TEST(PrometheusMetricsTest, MultipleMetricsCoexist) {
 
 TEST(PrometheusMetricsTest, ThreadSafeCounterUnderContention) {
     PrometheusMetrics m;
-    std::atomic<int> done{0};
     std::vector<std::thread> threads;
     for (int i = 0; i < 8; ++i) {
         threads.emplace_back([&] {

@@ -33,7 +33,7 @@ public:
 
     template <typename Rep, typename Period>
     void advance(std::chrono::duration<Rep, Period> d) {
-        now_ += std::chrono::duration_cast<Duration>(d);
+        now_ += std::chrono::duration_cast<TimePoint::duration>(d);
     }
 
 private:
