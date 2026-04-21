@@ -9,15 +9,15 @@ using namespace cpp_commons::security;
 // ── Malformed token structure ─────────────────────────────────────────────────
 
 TEST(JwtDecoderAdversarialTest, EmptyStringThrows) {
-    EXPECT_THROW(decode_jwt(""), JwtError);
+    EXPECT_THROW((void)decode_jwt(""), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, MissingFirstDotThrows) {
-    EXPECT_THROW(decode_jwt("nodotintoken"), JwtError);
+    EXPECT_THROW((void)decode_jwt("nodotintoken"), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, MissingSecondDotThrows) {
-    EXPECT_THROW(decode_jwt("header.payloadonly"), JwtError);
+    EXPECT_THROW((void)decode_jwt("header.payloadonly"), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, TooManyDotsStillDecodes) {
@@ -25,24 +25,24 @@ TEST(JwtDecoderAdversarialTest, TooManyDotsStillDecodes) {
     JwtSigner signer{"secret"};
     auto token = signer.sign({{"sub", "user"}, {"iat", 1}});
     auto tampered = token + ".extra.segment";
-    EXPECT_NO_THROW(decode_jwt(tampered));
+    EXPECT_NO_THROW((void)decode_jwt(tampered));
 }
 
 TEST(JwtDecoderAdversarialTest, EmptyHeaderSegmentThrows) {
-    EXPECT_THROW(decode_jwt(".payload.sig"), JwtError);
+    EXPECT_THROW((void)decode_jwt(".payload.sig"), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, EmptyPayloadSegmentThrows) {
-    EXPECT_THROW(decode_jwt("header..sig"), JwtError);
+    EXPECT_THROW((void)decode_jwt("header..sig"), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, NonBase64HeaderThrows) {
-    EXPECT_THROW(decode_jwt("!!!.payload.sig"), JwtError);
+    EXPECT_THROW((void)decode_jwt("!!!.payload.sig"), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, InvalidJsonPayloadThrows) {
     // Valid base64url of "{bad json"
-    EXPECT_THROW(decode_jwt("e30.e2JhZA.sig"), JwtError);  // header={}, payload={bad
+    EXPECT_THROW((void)decode_jwt("e30.e2JhZA.sig"), JwtError);  // header={}, payload={bad
 }
 
 // ── alg:none accepted (decoder is non-verifying by design) ───────────────────
@@ -84,7 +84,7 @@ TEST(JwtDecoderAdversarialTest, VerifyRejectsTokenWithStrippedSignature) {
     auto token = signer.sign({{"sub", "user"}, {"iat", 1}});
     auto d2 = token.rfind('.');
     std::string stripped = token.substr(0, d2 + 1);  // keep trailing dot, empty sig
-    EXPECT_THROW(signer.verify(stripped), JwtError);
+    EXPECT_THROW((void)signer.verify(stripped), JwtError);
 }
 
 TEST(JwtDecoderAdversarialTest, VerifyRejectsExpiredToken) {
@@ -93,5 +93,5 @@ TEST(JwtDecoderAdversarialTest, VerifyRejectsExpiredToken) {
     auto token = signer.sign({{"sub", "user"}, {"iat", 1}, {"exp", 1}});
     // decode_jwt itself doesn't check expiry — caller must; verify doesn't either
     // (our JwtSigner.verify only checks HMAC, not claims). Just ensure no crash.
-    EXPECT_NO_THROW(signer.verify(token));
+    EXPECT_NO_THROW((void)signer.verify(token));
 }

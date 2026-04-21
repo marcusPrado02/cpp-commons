@@ -40,7 +40,7 @@ TEST(JwtSignerTest, VerifyRejectsTokenFromDifferentSecret) {
     JwtSigner signer_b{"different-secret"};
 
     auto token = signer_a.sign({{"sub", "bob"}, {"iat", 3000}});
-    EXPECT_THROW(signer_b.verify(token), JwtError);
+    EXPECT_THROW((void)signer_b.verify(token), JwtError);
 }
 
 TEST(JwtSignerTest, VerifyRejectsTamperedPayload) {
@@ -53,7 +53,7 @@ TEST(JwtSignerTest, VerifyRejectsTamperedPayload) {
     std::string tampered = token.substr(0, d1 + 1) +
                            "eyJzdWIiOiJoYWNrZXIiLCJpYXQiOjB9" +  // {"sub":"hacker","iat":0}
                            token.substr(d2);
-    EXPECT_THROW(signer.verify(tampered), JwtError);
+    EXPECT_THROW((void)signer.verify(tampered), JwtError);
 }
 
 TEST(JwtSignerTest, SignAddsIatWhenAbsent) {
@@ -73,7 +73,7 @@ TEST(JwtSignerTest, SignPreservesExistingIat) {
 TEST(JwtSignerTest, EmptySecretSignsAndVerifies) {
     JwtSigner signer{""};
     auto token = signer.sign({{"sub", "x"}, {"iat", 1}});
-    EXPECT_NO_THROW(signer.verify(token));
+    EXPECT_NO_THROW((void)signer.verify(token));
 }
 
 TEST(JwtSignerTest, DifferentSecretsProduceDifferentTokens) {

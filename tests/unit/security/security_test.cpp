@@ -56,44 +56,43 @@ TEST(JwtDecoderTest, DecodesSubjectAndIssuer) {
 }
 
 TEST(JwtDecoderTest, ThrowsOnMalformedToken) {
-    EXPECT_THROW(decode_jwt("notajwt"), JwtError);
+    EXPECT_THROW((void)decode_jwt("notajwt"), JwtError);
 }
 
 TEST(JwtDecoderTest, ThrowsOnMissingSecondDot) {
-    EXPECT_THROW(decode_jwt("header.payload"), JwtError);
+    EXPECT_THROW((void)decode_jwt("header.payload"), JwtError);
 }
 
 // ── JwtDecoder adversarial ────────────────────────────────────────────────────
 
 TEST(JwtDecoderAdversarial, EmptyTokenThrows) {
-    EXPECT_THROW(decode_jwt(""), JwtError);
+    EXPECT_THROW((void)decode_jwt(""), JwtError);
 }
 
 TEST(JwtDecoderAdversarial, TwoDotsEmptyPartsThrows) {
-    EXPECT_THROW(decode_jwt(".."), JwtError);
+    EXPECT_THROW((void)decode_jwt(".."), JwtError);
 }
 
 TEST(JwtDecoderAdversarial, InvalidBase64InHeaderThrows) {
-    EXPECT_THROW(decode_jwt("!!!.payload.sig"), JwtError);
+    EXPECT_THROW((void)decode_jwt("!!!.payload.sig"), JwtError);
 }
 
 TEST(JwtDecoderAdversarial, InvalidJsonPayloadThrows) {
     // Valid base64 but decodes to "not-json"
     // base64url of "not-json" = "bm90LWpzb24"
-    EXPECT_THROW(decode_jwt("eyJhbGciOiJub25lIn0.bm90LWpzb24."), JwtError);
+    EXPECT_THROW((void)decode_jwt("eyJhbGciOiJub25lIn0.bm90LWpzb24."), JwtError);
 }
 
 TEST(JwtDecoderAdversarial, ExtraDotsDoNotThrow) {
     // Extra segments are accepted (signature segment can be non-empty)
-    EXPECT_NO_THROW(
-        decode_jwt("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
-                   ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
-                   ".fakesig"));
+    EXPECT_NO_THROW((void)decode_jwt("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
+                                     ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
+                                     ".fakesig"));
 }
 
 TEST(JwtDecoderAdversarial, VeryLongTokenDoesNotCrash) {
     std::string long_junk(10000, 'A');
-    EXPECT_THROW(decode_jwt(long_junk + "." + long_junk + "." + long_junk), JwtError);
+    EXPECT_THROW((void)decode_jwt(long_junk + "." + long_junk + "." + long_junk), JwtError);
 }
 
 // ── PiiRedactor adversarial ───────────────────────────────────────────────────

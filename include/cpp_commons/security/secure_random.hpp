@@ -45,12 +45,12 @@ private:
             const auto b1 = (i + 1 < data.size()) ? static_cast<uint8_t>(data[i + 1]) : 0u;
             const auto b2 = (i + 2 < data.size()) ? static_cast<uint8_t>(data[i + 2]) : 0u;
 
-            out += kAlphabet[(b0 >> 2) & 0x3F];
-            out += kAlphabet[((b0 & 0x03) << 4) | (b1 >> 4)];
+            out += kAlphabet[static_cast<std::size_t>((b0 >> 2) & 0x3Fu)];
+            out += kAlphabet[static_cast<std::size_t>(((b0 & 0x03u) << 4u) | (b1 >> 4u))];
             if (i + 1 < data.size())
-                out += kAlphabet[((b1 & 0x0F) << 2) | (b2 >> 6)];
+                out += kAlphabet[static_cast<std::size_t>(((b1 & 0x0Fu) << 2u) | (b2 >> 6u))];
             if (i + 2 < data.size())
-                out += kAlphabet[b2 & 0x3F];
+                out += kAlphabet[static_cast<std::size_t>(b2 & 0x3Fu)];
         }
         return out;
     }
