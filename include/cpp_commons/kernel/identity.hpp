@@ -63,6 +63,11 @@ public:
             lo_ & 0x0000FFFFFFFFFFFFULL);
     }
 
+    // 32-char lowercase hex, no dashes — W3C Trace Context trace-id format.
+    [[nodiscard]] std::string to_string_no_dashes() const {
+        return std::format("{:016x}{:016x}", hi_, lo_);
+    }
+
     [[nodiscard]] uint64_t hi() const noexcept { return hi_; }
     [[nodiscard]] uint64_t lo() const noexcept { return lo_; }
 
