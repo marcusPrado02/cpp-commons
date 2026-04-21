@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.25)
 project(cpp_commons
     VERSION 0.1.0
     DESCRIPTION "C++ commons library — 12-factor, DDD, CQRS, Hexagonal"
-    LANGUAGES CXX
+    LANGUAGES C CXX
 )
 
 set(CMAKE_CXX_STANDARD 20)
@@ -75,6 +75,12 @@ FetchContent_Declare(yaml_cpp
     GIT_SHALLOW    TRUE
 )
 
+FetchContent_Declare(argon2
+    GIT_REPOSITORY https://github.com/P-H-C/phc-winner-argon2.git
+    GIT_TAG        20190702
+    GIT_SHALLOW    TRUE
+)
+
 # Make available (only what we need now; others added per module)
 FetchContent_MakeAvailable(tl_expected nlohmann_json)
 
@@ -104,6 +110,23 @@ find_package(OpenSSL QUIET)
 
 # zlib (system)
 find_package(ZLIB QUIET)
+
+# argon2 (phc-winner-argon2, no CMakeLists — wire sources manually)
+FetchContent_MakeAvailable(argon2)
+add_library(argon2_lib STATIC
+    ${argon2_SOURCE_DIR}/src/argon2.c
+    ${argon2_SOURCE_DIR}/src/core.c
+    ${argon2_SOURCE_DIR}/src/blake2/blake2b.c
+    ${argon2_SOURCE_DIR}/src/thread.c
+    ${argon2_SOURCE_DIR}/src/encoding.c
+    ${argon2_SOURCE_DIR}/src/ref.c
+)
+add_library(argon2::argon2 ALIAS argon2_lib)
+target_include_directories(argon2_lib PUBLIC
+    $<BUILD_INTERFACE:${argon2_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
+set_target_properties(argon2_lib PROPERTIES C_STANDARD 99)
 
 # ── INTERFACE (header-only) targets ──────────────────────────────────────────
 
@@ -192,6 +215,7 @@ install(TARGETS
         cpp_commons_application
         cpp_commons_web
         cpp_commons_security
+        argon2_lib        # argon2::argon2
         # Bundled FetchContent deps
         expected          # tl::expected
         nlohmann_json     # nlohmann_json::nlohmann_json

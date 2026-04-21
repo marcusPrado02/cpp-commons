@@ -26,3 +26,5 @@ if(OpenSSL_FOUND)
     target_link_libraries(cpp_commons_security PUBLIC OpenSSL::SSL OpenSSL::Crypto)
     target_compile_definitions(cpp_commons_security PUBLIC CPP_COMMONS_HAS_OPENSSL)
 endif()
+
+target_link_libraries(cpp_commons_security PUBLIC argon2::argon2)

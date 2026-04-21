@@ -5,6 +5,7 @@ add_executable(security_tests
     jwt_decoder_adversarial_test.cpp
     pii_redactor_adversarial_test.cpp
     key_rotation_service_test.cpp
+    argon2_hasher_test.cpp
 )
 
 target_include_directories(security_tests PRIVATE
