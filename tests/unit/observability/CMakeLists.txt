@@ -4,6 +4,7 @@ add_executable(observability_tests
     context_aware_executor_test.cpp
     prometheus_metrics_test.cpp
     otel_tracer_test.cpp
+    json_logger_test.cpp
 )
 
 target_include_directories(observability_tests PRIVATE
