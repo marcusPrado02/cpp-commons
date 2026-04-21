@@ -126,10 +126,10 @@ TEST(MiddlewareChainTest, ExceptionFromHandlerPropagatesThroughMiddlewares) {
     });
 
     HttpRequest req;
-    EXPECT_THROW(chain.dispatch(req,
-                                [](const HttpRequest&) -> HttpResponse {
-                                    throw std::runtime_error{"handler blew up"};
-                                }),
+    EXPECT_THROW((void)chain.dispatch(req,
+                                      [](const HttpRequest&) -> HttpResponse {
+                                          throw std::runtime_error{"handler blew up"};
+                                      }),
                  std::runtime_error);
     EXPECT_TRUE(cleanup_ran);
 }
