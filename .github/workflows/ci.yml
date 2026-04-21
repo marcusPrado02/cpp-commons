@@ -110,7 +110,10 @@ jobs:
           python3 -c "
           import json
           db = json.load(open('build/ci/compile_commands.json'))
-          files = sorted({e['file'] for e in db if '/src/' in e['file'] and e['file'].endswith('.cpp')})
+          files = sorted({e['file'] for e in db
+                          if e['file'].endswith('.cpp')
+                          and '/_deps/' not in e['file']
+                          and '/build/' not in e['file']})
           print('\n'.join(files))
           " | xargs clang-tidy-17 -p build/ci
 
