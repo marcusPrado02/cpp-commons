@@ -4,6 +4,7 @@ add_executable(application_tests
     query_bus_test.cpp
     mediator_test.cpp
     tracing_middleware_test.cpp
+    outbox_publisher_test.cpp
 )
 
 target_include_directories(application_tests PRIVATE
