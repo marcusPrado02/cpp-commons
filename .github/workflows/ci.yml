@@ -107,8 +107,12 @@ jobs:
         run: cmake --build --preset ci
       - name: Run clang-tidy
         run: |
-          find src -name '*.cpp' \
-            | xargs clang-tidy-17 -p build/ci
+          python3 -c "
+          import json
+          db = json.load(open('build/ci/compile_commands.json'))
+          files = sorted({e['file'] for e in db if '/src/' in e['file'] and e['file'].endswith('.cpp')})
+          print('\n'.join(files))
+          " | xargs clang-tidy-17 -p build/ci
 
   coverage:
     name: coverage
