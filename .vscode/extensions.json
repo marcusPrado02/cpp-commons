@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "llvm-vs-code-extensions.vscode-clangd",
+    "ms-vscode.cmake-tools",
+    "xaver.clang-format",
+    "hbenl.vscode-test-explorer",
+    "matepek.vscode-catch2-test-adapter",
+    "github.vscode-github-actions"
+  ],
+  "unwantedRecommendations": [
+    "ms-vscode.cpptools"
+  ]
+}

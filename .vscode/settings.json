@@ -1,0 +1,25 @@
+{
+  "cmake.configurePreset": "dev",
+  "cmake.buildPreset": "dev",
+  "cmake.testPreset": "dev",
+  "cmake.buildBeforeRun": true,
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "clangd.arguments": [
+    "--compile-commands-dir=${workspaceFolder}/build/dev",
+    "--clang-tidy",
+    "--header-insertion=never",
+    "--completion-style=bundled",
+    "--background-index"
+  ],
+  "editor.formatOnSave": true,
+  "[cpp]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  },
+  "[c]": {
+    "editor.defaultFormatter": "xaver.clang-format"
+  },
+  "files.associations": {
+    "*.hpp": "cpp"
+  },
+  "testing.automaticallyOpenPeekView": "never"
+}
