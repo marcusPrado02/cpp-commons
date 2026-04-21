@@ -33,3 +33,42 @@ TEST(QueryBusTest, ThrowsWhenHandlerMissing) {
     QueryBus bus;
     EXPECT_THROW([[maybe_unused]] auto _ = bus.query<int>(OrderCount{}), QueryNotRegistered);
 }
+
+TEST(QueryBusTest, MultipleQueryTypesRegistered) {
+    struct ProductCount {};
+    struct UserCount {};
+    QueryBus bus;
+    bus.register_handler<ProductCount>([](const ProductCount&) { return 5; });
+    bus.register_handler<UserCount>([](const UserCount&) { return 12; });
+    EXPECT_EQ(bus.query<int>(ProductCount{}), 5);
+    EXPECT_EQ(bus.query<int>(UserCount{}), 12);
+}
+
+TEST(QueryBusTest, HandlerReceivesQueryFields) {
+    struct FindById { int id; };
+    QueryBus bus;
+    int captured = 0;
+    bus.register_handler<FindById>([&](const FindById& q) {
+        captured = q.id;
+        return std::string{"found"};
+    });
+    auto result = bus.query<std::string>(FindById{77});
+    EXPECT_EQ(result, "found");
+    EXPECT_EQ(captured, 77);
+}
+
+TEST(QueryBusTest, LastRegisteredHandlerWins) {
+    QueryBus bus;
+    bus.register_handler<OrderCount>([](const OrderCount&) { return 1; });
+    bus.register_handler<OrderCount>([](const OrderCount&) { return 2; });
+    EXPECT_EQ(bus.query<int>(OrderCount{}), 2);
+}
+
+TEST(QueryBusTest, StringResultType) {
+    struct Greeting {};
+    QueryBus bus;
+    bus.register_handler<Greeting>([](const Greeting&) {
+        return std::string{"hello"};
+    });
+    EXPECT_EQ(bus.query<std::string>(Greeting{}), "hello");
+}
