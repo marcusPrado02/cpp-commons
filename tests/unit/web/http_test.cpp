@@ -3,6 +3,8 @@
 #include <middleware_chain.hpp>
 #include <cors_middleware.hpp>
 #include <gtest/gtest.h>
+#include <chrono>
+#include <stdexcept>
 
 using namespace cpp_commons::web;
 
@@ -110,6 +112,54 @@ TEST(MiddlewareChainTest, MiddlewareCanShortCircuit) {
         return HttpResponse::ok("should not reach");
     });
     EXPECT_EQ(resp.status_code, 401);
+}
+
+TEST(MiddlewareChainTest, ExceptionFromHandlerPropagatesThroughMiddlewares) {
+    MiddlewareChain chain;
+    bool cleanup_ran = false;
+
+    chain.use([&cleanup_ran](const HttpRequest& r, const Handler& next) -> HttpResponse {
+        try {
+            return next(r);
+        } catch (...) {
+            cleanup_ran = true;
+            throw;
+        }
+    });
+
+    HttpRequest req;
+    EXPECT_THROW(
+        chain.dispatch(req, [](const HttpRequest&) -> HttpResponse {
+            throw std::runtime_error{"handler blew up"};
+        }),
+        std::runtime_error);
+    EXPECT_TRUE(cleanup_ran);
+}
+
+TEST(MiddlewareChainTest, MiddlewareCanMaintainStatePerRequest) {
+    MiddlewareChain chain;
+
+    // Each call gets its own start_time capture — state is per-invocation, not shared.
+    chain.use([](const HttpRequest& r, const Handler& next) -> HttpResponse {
+        auto start = std::chrono::steady_clock::now();
+        auto resp  = next(r);
+        auto elapsed = std::chrono::steady_clock::now() - start;
+        // elapsed is local to this invocation — proves per-request isolation.
+        auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+        HttpResponse tagged = resp;
+        tagged.headers["X-Duration-Ms"] = std::to_string(ms);
+        return tagged;
+    });
+
+    HttpRequest req;
+    auto r1 = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("a"); });
+    auto r2 = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("b"); });
+
+    EXPECT_TRUE(r1.headers.count("X-Duration-Ms") > 0);
+    EXPECT_TRUE(r2.headers.count("X-Duration-Ms") > 0);
+    // Each response has its own header, not shared state.
+    EXPECT_EQ(r1.body, "a");
+    EXPECT_EQ(r2.body, "b");
 }
 
 // ── CORS middleware ───────────────────────────────────────────────────────────

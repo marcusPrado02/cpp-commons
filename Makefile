@@ -1,4 +1,4 @@
-.PHONY: configure build test lint format format-check sanitize coverage docs clean
+.PHONY: configure build test lint format format-check sanitize coverage docs install fuzz clean
 
 configure:
 	cmake --preset=dev
@@ -39,6 +39,20 @@ docs:
 	@command -v doxygen >/dev/null 2>&1 || { echo "doxygen not found — install it first"; exit 1; }
 	doxygen Doxyfile
 	@echo "Documentation: docs/doxygen/html/index.html"
+
+install:
+	cmake --preset=release
+	cmake --build --preset=release --parallel
+	cmake --install build/release --prefix $(PREFIX)
+
+fuzz:
+	@test -n "$(TARGET)" || { echo "Usage: make fuzz TARGET=fuzz_uuid_parse"; exit 1; }
+	cmake -B build/fuzz -G Ninja \
+	  -DCMAKE_BUILD_TYPE=Debug \
+	  -DCMAKE_CXX_FLAGS="-fsanitize=fuzzer,address" \
+	  -DCPP_COMMONS_BUILD_TESTS=OFF
+	cmake --build build/fuzz --target $(TARGET)
+	./build/fuzz/tests/fuzz/$(TARGET)
 
 clean:
 	rm -rf build/
