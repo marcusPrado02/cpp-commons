@@ -74,7 +74,7 @@ JsonLogger JsonLogger::with_file(std::string service_name, const std::string& fi
                                  std::size_t max_size_mb, std::size_t max_files) {
     // NOLINTEND(bugprone-easily-swappable-parameters)
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-    static constexpr std::size_t kBytesPerMb = 1024UZ * 1024UZ;
+    static constexpr std::size_t kBytesPerMb = 1024UL * 1024UL;
     auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
         file_path, max_size_mb * kBytesPerMb, max_files);
     auto logger = std::make_shared<spdlog::logger>(service_name,
