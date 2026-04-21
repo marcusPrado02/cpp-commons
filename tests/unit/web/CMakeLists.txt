@@ -1,5 +1,6 @@
 add_executable(web_tests
     http_test.cpp
+    idempotency_middleware_test.cpp
 )
 
 target_include_directories(web_tests PRIVATE
