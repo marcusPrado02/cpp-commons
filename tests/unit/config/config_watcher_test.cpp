@@ -5,6 +5,7 @@
 #include <chrono>
 #include <fstream>
 #include <thread>
+#include <unistd.h>
 
 using namespace cpp_commons::config;
 using namespace std::chrono_literals;
@@ -13,7 +14,7 @@ using namespace std::chrono_literals;
 
 static std::string tmp_file() {
     static int n = 0;
-    return "/tmp/cpp_commons_config_watcher_" + std::to_string(++n) + ".cfg";
+    return "/tmp/cpp_commons_cw_" + std::to_string(::getpid()) + "_" + std::to_string(++n) + ".cfg";
 }
 
 static void write_file(const std::string& path, const std::string& content = "v1") {
