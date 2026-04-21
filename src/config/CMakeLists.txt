@@ -18,4 +18,5 @@ target_link_libraries(cpp_commons_config
         cpp_commons::errors
     PRIVATE
         nlohmann_json::nlohmann_json
+        yaml-cpp::yaml-cpp
 )

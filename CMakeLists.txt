@@ -69,6 +69,12 @@ FetchContent_Declare(googlebenchmark
     GIT_SHALLOW    TRUE
 )
 
+FetchContent_Declare(yaml_cpp
+    GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
+    GIT_TAG        0.8.0
+    GIT_SHALLOW    TRUE
+)
+
 # Make available (only what we need now; others added per module)
 FetchContent_MakeAvailable(tl_expected nlohmann_json)
 
@@ -87,6 +93,11 @@ target_compile_definitions(asio_interface INTERFACE
 
 # spdlog
 FetchContent_MakeAvailable(spdlog)
+
+# yaml-cpp
+set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(yaml_cpp)
 
 # OpenSSL (system)
 find_package(OpenSSL QUIET)
@@ -183,6 +194,7 @@ install(TARGETS
         nlohmann_json     # nlohmann_json::nlohmann_json
         spdlog            # spdlog::spdlog
         asio_interface    # asio::asio
+        yaml-cpp          # yaml-cpp::yaml-cpp
     EXPORT CppCommonsTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
