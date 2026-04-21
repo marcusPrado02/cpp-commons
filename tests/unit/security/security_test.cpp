@@ -85,9 +85,10 @@ TEST(JwtDecoderAdversarial, InvalidJsonPayloadThrows) {
 
 TEST(JwtDecoderAdversarial, ExtraDotsDoNotThrow) {
     // Extra segments are accepted (signature segment can be non-empty)
-    EXPECT_NO_THROW((void)decode_jwt("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
-                                     ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
-                                     ".fakesig"));
+    EXPECT_NO_THROW(
+        (void)decode_jwt("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
+                         ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
+                         ".fakesig"));
 }
 
 TEST(JwtDecoderAdversarial, VeryLongTokenDoesNotCrash) {

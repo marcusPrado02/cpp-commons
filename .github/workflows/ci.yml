@@ -107,7 +107,7 @@ jobs:
         run: cmake --build --preset ci
       - name: Run clang-tidy
         run: |
-          find include src -name '*.hpp' -o -name '*.cpp' \
+          find src tests -name '*.cpp' \
             | xargs clang-tidy-17 -p build/ci
 
   coverage:
