@@ -52,6 +52,30 @@ jobs:
       - name: Test
         run: ctest --preset ${{ matrix.preset }}
 
+  build-and-test-macos:
+    name: "Apple Clang / ci (macOS)"
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ninja
+        run: brew install ninja
+
+      - name: Cache CMake deps
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ runner.os }}-appleclang-deps-${{ hashFiles('CMakeLists.txt') }}
+
+      - name: Configure
+        run: cmake --preset ci
+
+      - name: Build
+        run: cmake --build --preset ci
+
+      - name: Test
+        run: ctest --preset ci
+
   format:
     name: clang-format
     runs-on: ubuntu-24.04
@@ -127,3 +151,103 @@ jobs:
         with:
           name: coverage-report
           path: coverage.filtered.info
+
+  benchmark:
+    name: benchmark
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y gcc-13 g++-13 ninja-build
+
+      - name: Cache CMake deps
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: ${{ runner.os }}-gcc-13-deps-${{ hashFiles('CMakeLists.txt') }}
+
+      - name: Configure (benchmark preset)
+        env:
+          CC: gcc-13
+          CXX: g++-13
+        run: cmake --preset benchmark
+
+      - name: Build
+        env:
+          CC: gcc-13
+          CXX: g++-13
+        run: cmake --build --preset benchmark --parallel
+
+      - name: Run benchmarks
+        run: |
+          find build/benchmark/tests/benchmarks -type f -perm /111 \
+            | while read -r bin; do
+                "$bin" --benchmark_format=json \
+                  >> benchmark_results.json
+              done
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results-${{ github.sha }}
+          path: benchmark_results.json
+
+      - name: Download previous benchmark results
+        id: prev
+        uses: dawidd6/action-download-artifact@v3
+        continue-on-error: true
+        with:
+          workflow: ci.yml
+          branch: main
+          name_is_regexp: true
+          name: benchmark-results-.*
+          search_artifacts: true
+          path: prev_results/
+
+      - name: Compare benchmark results
+        if: steps.prev.outcome == 'success'
+        run: |
+          prev=$(find prev_results -name '*.json' | head -1)
+          if [ -z "$prev" ]; then echo "No previous results found, skipping comparison"; exit 0; fi
+          python3 - <<'PYEOF'
+          import json, sys, glob, os
+
+          curr_path = "benchmark_results.json"
+          prev_path = glob.glob("prev_results/**/*.json", recursive=True)
+          if not prev_path: sys.exit(0)
+
+          def load(p):
+              results = {}
+              with open(p) as f:
+                  for line in f:
+                      line = line.strip()
+                      if not line: continue
+                      try:
+                          data = json.loads(line)
+                      except json.JSONDecodeError:
+                          continue
+                      for b in data.get("benchmarks", []):
+                          results[b["name"]] = b.get("real_time", 0)
+              return results
+
+          curr = load(curr_path)
+          prev = load(prev_path[0])
+
+          regressions = []
+          for name, t_curr in curr.items():
+              t_prev = prev.get(name)
+              if t_prev and t_prev > 0:
+                  ratio = t_curr / t_prev
+                  if ratio > 1.20:
+                      regressions.append(f"  {name}: {t_prev:.1f} → {t_curr:.1f} ns (+{(ratio-1)*100:.0f}%)")
+
+          if regressions:
+              print("Performance regressions (>20%):")
+              for r in regressions: print(r)
+              sys.exit(1)
+          else:
+              print("No benchmark regressions detected.")
+          PYEOF
