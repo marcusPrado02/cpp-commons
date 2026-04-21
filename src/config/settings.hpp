@@ -2,6 +2,7 @@
 #include <cpp_commons/errors/domain_error.hpp>
 #include <chrono>
 #include <cstdlib>
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -48,6 +49,31 @@ inline bool env_as<bool>(const char* name) {
     if (!val) return false;
     std::string s{val};
     return s == "1" || s == "true" || s == "yes" || s == "on";
+}
+
+// Read and validate an env var with a predicate.
+// Throws ConfigError with a descriptive message if the predicate returns false.
+// Usage: require_validated<int>("PORT", [](int v){ return v > 0 && v < 65536; });
+template<typename T>
+T require_validated(const char* name, std::function<bool(const T&)> predicate,
+                    const char* constraint_desc = "predicate failed") {
+    auto val = env_as<T>(name);
+    if (!predicate(val))
+        throw ConfigError{std::string{name} + ": " + constraint_desc + " (got: " +
+                          std::to_string(val) + ")"};
+    return val;
+}
+
+template<>
+inline std::string require_validated<std::string>(
+    const char* name,
+    std::function<bool(const std::string&)> predicate,
+    const char* constraint_desc)
+{
+    auto val = env_as<std::string>(name);
+    if (!predicate(val))
+        throw ConfigError{std::string{name} + ": " + constraint_desc + " (got: " + val + ")"};
+    return val;
 }
 
 template<typename T>

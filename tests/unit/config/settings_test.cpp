@@ -143,6 +143,52 @@ TEST(ConfigValidatorTest, RequireDurationAggregatesOnBadSuffix) {
     ::unsetenv("CPP_COMMONS_V_TTL");
 }
 
+// ── require_validated ────────────────────────────────────────────────────────
+
+TEST(RequireValidatedTest, PassesWhenPredicateTrue) {
+    ::setenv("CPP_COMMONS_TEST_PORT", "8080", 1);
+    auto v = require_validated<int>(
+        "CPP_COMMONS_TEST_PORT",
+        [](int p) { return p > 0 && p < 65536; },
+        "port must be 1-65535");
+    EXPECT_EQ(v, 8080);
+    ::unsetenv("CPP_COMMONS_TEST_PORT");
+}
+
+TEST(RequireValidatedTest, ThrowsWhenPredicateFalse) {
+    ::setenv("CPP_COMMONS_TEST_PORT", "0", 1);
+    EXPECT_THROW(
+        require_validated<int>(
+            "CPP_COMMONS_TEST_PORT",
+            [](int p) { return p > 0 && p < 65536; },
+            "port must be 1-65535"),
+        ConfigError);
+    ::unsetenv("CPP_COMMONS_TEST_PORT");
+}
+
+TEST(RequireValidatedTest, ErrorMessageContainsConstraint) {
+    ::setenv("CPP_COMMONS_TEST_HOST", "localhost", 1);
+    try {
+        require_validated<std::string>(
+            "CPP_COMMONS_TEST_HOST",
+            [](const std::string& s) { return s.find('.') != std::string::npos; },
+            "must contain a dot");
+        FAIL();
+    } catch (const ConfigError& e) {
+        EXPECT_NE(std::string{e.what()}.find("must contain a dot"), std::string::npos);
+    }
+    ::unsetenv("CPP_COMMONS_TEST_HOST");
+}
+
+TEST(RequireValidatedTest, ThrowsWhenVarMissing) {
+    ::unsetenv("CPP_COMMONS_TEST_MISSING");
+    EXPECT_THROW(
+        require_validated<int>(
+            "CPP_COMMONS_TEST_MISSING",
+            [](int) { return true; }),
+        ConfigError);
+}
+
 // ── EnvSource prefix ─────────────────────────────────────────────────────────
 
 TEST(EnvSourcePrefixTest, NoPrefixReadsDirect) {
