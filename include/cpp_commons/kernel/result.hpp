@@ -7,8 +7,11 @@ namespace cpp_commons::kernel {
 template<typename T, typename E>
 class Result {
 public:
+    using value_type = T;
+    using error_type = E;
+
     static Result ok(T val)  { return Result{tl::expected<T,E>{std::move(val)}}; }
-    static Result err(E err) { return Result{tl::expected<T,E>{tl::unexpected<E>{std::move(err)}}}; }
+    static Result err(E e)   { return Result{tl::expected<T,E>{tl::unexpected<E>{std::move(e)}}}; }
 
     bool is_ok()  const noexcept { return inner_.has_value(); }
     bool is_err() const noexcept { return !inner_.has_value(); }
@@ -27,11 +30,32 @@ public:
     template<typename F> auto map(F&& fn)      &       { return inner_.map(std::forward<F>(fn)); }
     template<typename F> auto map(F&& fn)      const & { return inner_.map(std::forward<F>(fn)); }
 
+    // Transform the error value; value passes through unchanged.
+    template<typename F>
+    auto map_err(F&& fn) & {
+        using E2 = std::invoke_result_t<F, E&>;
+        if (is_err()) return Result<T, E2>::err(std::forward<F>(fn)(inner_.error()));
+        return Result<T, E2>::ok(inner_.value());
+    }
+    template<typename F>
+    auto map_err(F&& fn) const & {
+        using E2 = std::invoke_result_t<F, const E&>;
+        if (is_err()) return Result<T, E2>::err(std::forward<F>(fn)(inner_.error()));
+        return Result<T, E2>::ok(inner_.value());
+    }
+
     explicit operator bool() const noexcept { return is_ok(); }
 
 private:
     explicit Result(tl::expected<T,E> inner) : inner_{std::move(inner)} {}
     tl::expected<T,E> inner_;
 };
+
+// Collapse Result<Result<T,E>,E> → Result<T,E>.
+template<typename T, typename E>
+Result<T, E> flatten(Result<Result<T, E>, E> r) {
+    if (r.is_err()) return Result<T, E>::err(std::move(r).error());
+    return std::move(r).value();
+}
 
 } // namespace cpp_commons::kernel
