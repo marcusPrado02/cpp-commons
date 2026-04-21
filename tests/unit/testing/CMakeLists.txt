@@ -1,6 +1,7 @@
 add_executable(testing_extras_tests
     testing_extras_test.cpp
     fake_implementations_test.cpp
+    matchers_test.cpp
 )
 
 target_include_directories(testing_extras_tests PRIVATE
@@ -10,7 +11,9 @@ target_include_directories(testing_extras_tests PRIVATE
 target_link_libraries(testing_extras_tests PRIVATE
     cpp_commons::kernel
     cpp_commons::testing
+    cpp_commons::errors
     GTest::gtest_main
+    GTest::gmock
 )
 
 gtest_discover_tests(testing_extras_tests)
