@@ -61,3 +61,67 @@ TEST(JwtDecoderTest, ThrowsOnMalformedToken) {
 TEST(JwtDecoderTest, ThrowsOnMissingSecondDot) {
     EXPECT_THROW(decode_jwt("header.payload"), JwtError);
 }
+
+// ── JwtDecoder adversarial ────────────────────────────────────────────────────
+
+TEST(JwtDecoderAdversarial, EmptyTokenThrows) {
+    EXPECT_THROW(decode_jwt(""), JwtError);
+}
+
+TEST(JwtDecoderAdversarial, TwoDotsEmptyPartsThrows) {
+    EXPECT_THROW(decode_jwt(".."), JwtError);
+}
+
+TEST(JwtDecoderAdversarial, InvalidBase64InHeaderThrows) {
+    EXPECT_THROW(decode_jwt("!!!.payload.sig"), JwtError);
+}
+
+TEST(JwtDecoderAdversarial, InvalidJsonPayloadThrows) {
+    // Valid base64 but decodes to "not-json"
+    // base64url of "not-json" = "bm90LWpzb24"
+    EXPECT_THROW(decode_jwt("eyJhbGciOiJub25lIn0.bm90LWpzb24."), JwtError);
+}
+
+TEST(JwtDecoderAdversarial, ExtraDotsDoNotThrow) {
+    // Extra segments are accepted (signature segment can be non-empty)
+    EXPECT_NO_THROW(decode_jwt(
+        "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
+        ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
+        ".fakesig"));
+}
+
+TEST(JwtDecoderAdversarial, VeryLongTokenDoesNotCrash) {
+    std::string long_junk(10000, 'A');
+    EXPECT_THROW(decode_jwt(long_junk + "." + long_junk + "." + long_junk), JwtError);
+}
+
+// ── PiiRedactor adversarial ───────────────────────────────────────────────────
+
+TEST(PiiRedactorAdversarial, EmptyStringReturnsEmpty) {
+    EXPECT_EQ(PiiRedactor::redact_all(""), "");
+}
+
+TEST(PiiRedactorAdversarial, NoMatchReturnsOriginal) {
+    const std::string input = "hello world, no pii here";
+    EXPECT_EQ(PiiRedactor::redact_all(input), input);
+}
+
+TEST(PiiRedactorAdversarial, MultipleEmailsAllRedacted) {
+    auto result = PiiRedactor::redact_email("a@b.com and c@d.org");
+    EXPECT_EQ(result.find('@'), std::string::npos);
+}
+
+TEST(PiiRedactorAdversarial, MultipleCardsAllRedacted) {
+    auto result = PiiRedactor::redact_card("4111 1111 1111 1111 and 5500 0000 0000 0004");
+    EXPECT_EQ(result.find("1111"), std::string::npos);
+    EXPECT_EQ(result.find("5500"), std::string::npos);
+}
+
+TEST(PiiRedactorAdversarial, OnlyWhitespaceReturnsWhitespace) {
+    EXPECT_EQ(PiiRedactor::redact_all("   "), "   ");
+}
+
+TEST(PiiRedactorAdversarial, EmbeddedEmailInUrl) {
+    auto result = PiiRedactor::redact_email("https://site.com/?user=foo@bar.com&x=1");
+    EXPECT_EQ(result.find("foo@bar.com"), std::string::npos);
+}
