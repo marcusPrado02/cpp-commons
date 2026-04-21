@@ -1,10 +1,13 @@
 #pragma once
 #include <array>
+#include <charconv>
 #include <cstdint>
 #include <format>
 #include <functional>
+#include <optional>
 #include <random>
 #include <string>
+#include <string_view>
 
 namespace cpp_commons::kernel {
 
@@ -20,7 +23,38 @@ public:
         return UUID{a, b};
     }
 
-    std::string to_string() const {
+    // Parse "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx". Returns nullopt on any error.
+    [[nodiscard]] static std::optional<UUID> from_string(std::string_view s) noexcept {
+        // Fixed layout: 8-4-4-4-12 hex digits + 4 dashes = 36 chars
+        if (s.size() != 36) return std::nullopt;
+        if (s[8] != '-' || s[13] != '-' || s[18] != '-' || s[23] != '-') return std::nullopt;
+
+        auto read_hex = [](std::string_view src, uint64_t& out) -> bool {
+            uint64_t v = 0;
+            for (char c : src) {
+                v <<= 4;
+                if (c >= '0' && c <= '9')      v |= static_cast<uint64_t>(c - '0');
+                else if (c >= 'a' && c <= 'f') v |= static_cast<uint64_t>(c - 'a' + 10);
+                else if (c >= 'A' && c <= 'F') v |= static_cast<uint64_t>(c - 'A' + 10);
+                else return false;
+            }
+            out = v;
+            return true;
+        };
+
+        uint64_t p1{}, p2{}, p3{}, p4{}, p5{};
+        if (!read_hex(s.substr(0,  8), p1)) return std::nullopt;
+        if (!read_hex(s.substr(9,  4), p2)) return std::nullopt;
+        if (!read_hex(s.substr(14, 4), p3)) return std::nullopt;
+        if (!read_hex(s.substr(19, 4), p4)) return std::nullopt;
+        if (!read_hex(s.substr(24, 12), p5)) return std::nullopt;
+
+        uint64_t hi = (p1 << 32) | (p2 << 16) | p3;
+        uint64_t lo = (p4 << 48) | p5;
+        return UUID{hi, lo};
+    }
+
+    [[nodiscard]] std::string to_string() const {
         return std::format("{:08x}-{:04x}-{:04x}-{:04x}-{:012x}",
             static_cast<uint32_t>(hi_ >> 32),
             static_cast<uint16_t>(hi_ >> 16),
@@ -45,10 +79,17 @@ template<typename Tag>
 class StrongId {
 public:
     StrongId() : uuid_{UUID::generate()} {}
-    explicit StrongId(UUID uuid) : uuid_{std::move(uuid)} {}
+    explicit StrongId(UUID uuid) : uuid_{uuid} {}
 
-    const UUID& uuid()         const { return uuid_; }
-    std::string to_string()    const { return uuid_.to_string(); }
+    // Parse from string representation — returns nullopt if invalid.
+    [[nodiscard]] static std::optional<StrongId> from_string(std::string_view s) noexcept {
+        auto uuid = UUID::from_string(s);
+        if (!uuid) return std::nullopt;
+        return StrongId{*uuid};
+    }
+
+    [[nodiscard]] const UUID& uuid()      const noexcept { return uuid_; }
+    [[nodiscard]] std::string to_string() const { return uuid_.to_string(); }
 
     bool operator==(const StrongId&) const = default;
     bool operator<(const StrongId& o) const { return uuid_ < o.uuid_; }
@@ -57,10 +98,10 @@ private:
     UUID uuid_;
 };
 
-struct EntityIdTag    {};
+struct EntityIdTag      {};
 struct CorrelationIdTag {};
-struct TenantIdTag    {};
-struct RequestIdTag   {};
+struct TenantIdTag      {};
+struct RequestIdTag     {};
 
 using EntityId      = StrongId<EntityIdTag>;
 using CorrelationId = StrongId<CorrelationIdTag>;
@@ -73,7 +114,6 @@ using RequestId     = StrongId<RequestIdTag>;
 template<>
 struct std::hash<cpp_commons::kernel::UUID> {
     std::size_t operator()(const cpp_commons::kernel::UUID& u) const noexcept {
-        // Knuth multiplicative hash combiner — better distribution than plain XOR
         return std::hash<uint64_t>{}(u.hi()) ^
                (std::hash<uint64_t>{}(u.lo()) * 0x9e3779b97f4a7c15ULL);
     }

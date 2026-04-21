@@ -43,6 +43,44 @@ TEST(StrongIdTest, TypesAreDistinct) {
     EXPECT_NE(eid.to_string(), cid.to_string());  // different UUIDs
 }
 
+// ── UUID::from_string ────────────────────────────────────────────────────────
+
+TEST(UUIDFromStringTest, RoundTrip) {
+    auto uuid = UUID::generate();
+    auto parsed = UUID::from_string(uuid.to_string());
+    ASSERT_TRUE(parsed.has_value());
+    EXPECT_EQ(*parsed, uuid);
+}
+
+TEST(UUIDFromStringTest, UpperCaseAccepted) {
+    auto parsed = UUID::from_string("550E8400-E29B-41D4-A716-446655440000");
+    EXPECT_TRUE(parsed.has_value());
+}
+
+TEST(UUIDFromStringTest, WrongLengthReturnsNullopt) {
+    EXPECT_FALSE(UUID::from_string("550e8400-e29b-41d4-a716").has_value());
+    EXPECT_FALSE(UUID::from_string("").has_value());
+}
+
+TEST(UUIDFromStringTest, InvalidCharReturnsNullopt) {
+    EXPECT_FALSE(UUID::from_string("550e8400-e29b-41d4-a716-44665544ZZZZ").has_value());
+}
+
+TEST(UUIDFromStringTest, MissingDashReturnsNullopt) {
+    EXPECT_FALSE(UUID::from_string("550e8400Xe29b-41d4-a716-446655440000").has_value());
+}
+
+TEST(StrongIdFromStringTest, RoundTrip) {
+    EntityId id;
+    auto parsed = EntityId::from_string(id.to_string());
+    ASSERT_TRUE(parsed.has_value());
+    EXPECT_EQ(*parsed, id);
+}
+
+TEST(StrongIdFromStringTest, InvalidReturnsNullopt) {
+    EXPECT_FALSE(EntityId::from_string("not-a-uuid").has_value());
+}
+
 // ── std::hash ────────────────────────────────────────────────────────────────
 
 TEST(UUIDHashTest, EqualUUIDsHaveSameHash) {
