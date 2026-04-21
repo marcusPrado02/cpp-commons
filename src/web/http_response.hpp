@@ -24,7 +24,27 @@ struct HttpResponse {
     }
 
     [[nodiscard]] static HttpResponse from_problem(const errors::ProblemDetails& pd) {
-        return {pd.status, {}, pd.to_json().dump()};
+        return {pd.status, {{"Content-Type", "application/problem+json"}}, pd.to_json().dump()};
+    }
+
+    [[nodiscard]] static HttpResponse bad_request(std::string detail) {
+        return from_problem(errors::ProblemDetails::validation_error(std::move(detail)));
+    }
+
+    [[nodiscard]] static HttpResponse unauthorized() {
+        return from_problem(errors::ProblemDetails::unauthorized());
+    }
+
+    [[nodiscard]] static HttpResponse not_found(std::string detail) {
+        return from_problem(errors::ProblemDetails::not_found(std::move(detail)));
+    }
+
+    [[nodiscard]] static HttpResponse conflict(std::string detail) {
+        return from_problem(errors::ProblemDetails::conflict(std::move(detail)));
+    }
+
+    [[nodiscard]] static HttpResponse internal_error() {
+        return from_problem(errors::ProblemDetails::internal_error());
     }
 };
 

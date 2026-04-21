@@ -31,6 +31,41 @@ TEST(HttpResponseTest, NoContent) {
     EXPECT_TRUE(resp.body.empty());
 }
 
+TEST(HttpResponseTest, NotFoundHas404AndProblemContentType) {
+    auto resp = HttpResponse::not_found("item 99 does not exist");
+    EXPECT_EQ(resp.status_code, 404);
+    EXPECT_EQ(resp.headers.at("Content-Type"), "application/problem+json");
+    EXPECT_NE(resp.body.find("not-found"), std::string::npos);
+}
+
+TEST(HttpResponseTest, UnauthorizedHas401) {
+    auto resp = HttpResponse::unauthorized();
+    EXPECT_EQ(resp.status_code, 401);
+}
+
+TEST(HttpResponseTest, BadRequestHas422) {
+    auto resp = HttpResponse::bad_request("name is required");
+    EXPECT_EQ(resp.status_code, 422);
+    EXPECT_NE(resp.body.find("name is required"), std::string::npos);
+}
+
+TEST(HttpResponseTest, ConflictHas409) {
+    auto resp = HttpResponse::conflict("duplicate key");
+    EXPECT_EQ(resp.status_code, 409);
+}
+
+TEST(HttpResponseTest, InternalErrorHas500) {
+    auto resp = HttpResponse::internal_error();
+    EXPECT_EQ(resp.status_code, 500);
+}
+
+TEST(HttpResponseTest, FromProblemSetsCorrectStatus) {
+    auto pd = cpp_commons::errors::ProblemDetails::not_found("missing");
+    auto resp = HttpResponse::from_problem(pd);
+    EXPECT_EQ(resp.status_code, 404);
+    EXPECT_EQ(resp.headers.at("Content-Type"), "application/problem+json");
+}
+
 TEST(MiddlewareChainTest, ExecutesFinalHandler) {
     MiddlewareChain chain;
     HttpRequest req;
