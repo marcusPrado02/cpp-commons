@@ -20,7 +20,9 @@ public:
     }
 
     template <typename Cmd>
-    void send(const Cmd& cmd) { commands_.send(cmd); }
+    void send(const Cmd& cmd) {
+        commands_.send(cmd);
+    }
 
     template <typename Result, typename Query>
     [[nodiscard]] Result query(const Query& q) {
@@ -29,7 +31,7 @@ public:
 
 private:
     CommandBus commands_;
-    QueryBus   queries_;
+    QueryBus queries_;
 };
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

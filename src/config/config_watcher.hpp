@@ -1,9 +1,9 @@
 #pragma once
+#include <atomic>
 #include <functional>
+#include <stdexcept>
 #include <string>
 #include <thread>
-#include <atomic>
-#include <stdexcept>
 
 #ifdef __linux__
 #include <sys/inotify.h>
@@ -25,24 +25,27 @@ public:
 
     ~ConfigWatcher() { stop(); }
 
-    ConfigWatcher(const ConfigWatcher&)            = delete;
+    ConfigWatcher(const ConfigWatcher&) = delete;
     ConfigWatcher& operator=(const ConfigWatcher&) = delete;
 
     void start() {
 #ifdef __linux__
-        if (running_.exchange(true)) return;
+        if (running_.exchange(true))
+            return;
         thread_ = std::thread([this] { watch_loop(); });
 #endif
     }
 
     void stop() {
 #ifdef __linux__
-        if (!running_.exchange(false)) return;
+        if (!running_.exchange(false))
+            return;
         if (inotify_fd_ >= 0) {
             ::close(inotify_fd_);
             inotify_fd_ = -1;
         }
-        if (thread_.joinable()) thread_.join();
+        if (thread_.joinable())
+            thread_.join();
 #endif
     }
 
@@ -57,8 +60,7 @@ private:
             return;
         }
 
-        int wd = ::inotify_add_watch(inotify_fd_, path_.c_str(),
-                                     IN_CLOSE_WRITE | IN_MOVED_TO);
+        int wd = ::inotify_add_watch(inotify_fd_, path_.c_str(), IN_CLOSE_WRITE | IN_MOVED_TO);
         if (wd < 0) {
             ::close(inotify_fd_);
             inotify_fd_ = -1;
@@ -73,14 +75,16 @@ private:
             fd_set rfds;
             FD_ZERO(&rfds);
             FD_SET(inotify_fd_, &rfds);
-            timeval tv{0, 100'000}; // 100ms poll interval
+            timeval tv{0, 100'000};  // 100ms poll interval
             int sel = ::select(inotify_fd_ + 1, &rfds, nullptr, nullptr, &tv);
-            if (sel <= 0) continue;
+            if (sel <= 0)
+                continue;
 
             ssize_t len = ::read(inotify_fd_, buf, buf_size);
-            if (len <= 0) break;
+            if (len <= 0)
+                break;
 
-            for (ssize_t i = 0; i < len; ) {
+            for (ssize_t i = 0; i < len;) {
                 auto* ev = reinterpret_cast<inotify_event*>(buf + i);
                 if (ev->mask & (IN_CLOSE_WRITE | IN_MOVED_TO))
                     callback_();
@@ -95,12 +99,12 @@ private:
     }
 
     std::atomic<int> inotify_fd_{-1};
-    std::thread      thread_;
+    std::thread thread_;
 #endif
 
-    std::string      path_;
-    Callback         callback_;
+    std::string path_;
+    Callback callback_;
     std::atomic<bool> running_{false};
 };
 
-} // namespace cpp_commons::config
+}  // namespace cpp_commons::config

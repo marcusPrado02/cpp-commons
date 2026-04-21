@@ -1,9 +1,9 @@
 #pragma once
-#include <yaml-cpp/yaml.h>
 #include <optional>
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#include <yaml-cpp/yaml.h>
 
 namespace cpp_commons::config {
 
@@ -17,7 +17,8 @@ public:
         try {
             root_ = YAML::LoadFile(path);
         } catch (const YAML::Exception& e) {
-            throw std::runtime_error{std::string{"YamlSource: cannot load '"} + path + "': " + e.what()};
+            throw std::runtime_error{std::string{"YamlSource: cannot load '"} + path +
+                                     "': " + e.what()};
         }
     }
 
@@ -39,12 +40,15 @@ public:
         std::size_t start = 0;
         while (start < key.size()) {
             auto dot = key.find('.', start);
-            auto part = dot == std::string::npos ? key.substr(start) : key.substr(start, dot - start);
-            if (!node.IsMap() || !node[part]) return std::nullopt;
+            auto part =
+                dot == std::string::npos ? key.substr(start) : key.substr(start, dot - start);
+            if (!node.IsMap() || !node[part])
+                return std::nullopt;
             node = node[part];
             start = dot == std::string::npos ? key.size() : dot + 1;
         }
-        if (!node.IsScalar()) return std::nullopt;
+        if (!node.IsScalar())
+            return std::nullopt;
         return node.as<std::string>();
     }
 
@@ -53,4 +57,4 @@ private:
     YAML::Node root_;
 };
 
-} // namespace cpp_commons::config
+}  // namespace cpp_commons::config

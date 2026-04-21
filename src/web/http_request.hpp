@@ -1,7 +1,7 @@
 #pragma once
+#include <optional>
 #include <string>
 #include <unordered_map>
-#include <optional>
 
 namespace cpp_commons::web {
 
@@ -18,15 +18,17 @@ struct HttpRequest {
 
     [[nodiscard]] std::optional<std::string> header(const std::string& name) const {
         auto it = headers.find(name);
-        if (it == headers.end()) return std::nullopt;
+        if (it == headers.end())
+            return std::nullopt;
         return it->second;
     }
 
     [[nodiscard]] std::optional<std::string> param(const std::string& name) const {
         auto it = query_params.find(name);
-        if (it == query_params.end()) return std::nullopt;
+        if (it == query_params.end())
+            return std::nullopt;
         return it->second;
     }
 };
 
-} // namespace cpp_commons::web
+}  // namespace cpp_commons::web

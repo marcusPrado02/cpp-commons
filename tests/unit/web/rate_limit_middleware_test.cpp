@@ -1,5 +1,6 @@
-#include <rate_limit_middleware.hpp>
 #include <middleware_chain.hpp>
+#include <rate_limit_middleware.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
@@ -44,6 +45,9 @@ TEST(RateLimitMiddlewareTest, HandlerNotCalledWhenRateLimited) {
     chain.use(rate_limit_middleware(0.0, 0.0));
 
     HttpRequest req;
-    (void)chain.dispatch(req, [&](const HttpRequest&) { ++calls; return HttpResponse::ok(""); });
+    (void)chain.dispatch(req, [&](const HttpRequest&) {
+        ++calls;
+        return HttpResponse::ok("");
+    });
     EXPECT_EQ(calls, 0);
 }

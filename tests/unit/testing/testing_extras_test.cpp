@@ -1,12 +1,14 @@
-#include <cpp_commons/testing/fake_tracer.hpp>
-#include <cpp_commons/testing/fake_repository.hpp>
-#include <cpp_commons/testing/in_memory_event_bus.hpp>
-#include <cpp_commons/kernel/domain_event.hpp>
-#include <gtest/gtest.h>
 #include <atomic>
 #include <string>
 #include <thread>
 #include <vector>
+
+#include <cpp_commons/kernel/domain_event.hpp>
+#include <cpp_commons/testing/fake_repository.hpp>
+#include <cpp_commons/testing/fake_tracer.hpp>
+#include <cpp_commons/testing/in_memory_event_bus.hpp>
+
+#include <gtest/gtest.h>
 
 namespace ct = cpp_commons::testing;
 
@@ -35,7 +37,7 @@ TEST(NoopTracerTest, CompilesAndSatisfiesConcept) {
     ct::NoopTracer t;
     t.start_span("anything");
     t.end_span();
-    SUCCEED(); // concept satisfied at compile time via static_assert
+    SUCCEED();  // concept satisfied at compile time via static_assert
 }
 
 // ── InMemoryEventBus ──────────────────────────────────────────────────────────
@@ -63,9 +65,7 @@ TEST(InMemoryEventBusTest, LastReturnsLatestEvent) {
 TEST(InMemoryEventBusTest, SubscriberReceivesEvent) {
     ct::InMemoryEventBus bus;
     std::string received;
-    bus.subscribe<ItemCreatedEvent>([&](const ItemCreatedEvent& e) {
-        received = e.item_id;
-    });
+    bus.subscribe<ItemCreatedEvent>([&](const ItemCreatedEvent& e) { received = e.item_id; });
     bus.publish<ItemCreatedEvent>("item-42");
     EXPECT_EQ(received, "item-42");
 }
@@ -86,9 +86,8 @@ TEST(InMemoryEventBusConcurrencyTest, ConcurrentPublishNoDataRace) {
     ct::InMemoryEventBus bus;
     std::atomic<int> handler_calls{0};
 
-    bus.subscribe<ItemCreatedEvent>([&](const ItemCreatedEvent&) {
-        handler_calls.fetch_add(1, std::memory_order_relaxed);
-    });
+    bus.subscribe<ItemCreatedEvent>(
+        [&](const ItemCreatedEvent&) { handler_calls.fetch_add(1, std::memory_order_relaxed); });
 
     std::vector<std::thread> threads;
     threads.reserve(kThreads);
@@ -98,7 +97,8 @@ TEST(InMemoryEventBusConcurrencyTest, ConcurrentPublishNoDataRace) {
                 bus.publish<ItemCreatedEvent>("item-" + std::to_string(i * kPerThread + j));
         });
     }
-    for (auto& t : threads) t.join();
+    for (auto& t : threads)
+        t.join();
 
     EXPECT_EQ(bus.count<ItemCreatedEvent>(), static_cast<std::size_t>(kThreads * kPerThread));
     EXPECT_EQ(handler_calls.load(), kThreads * kPerThread);
@@ -111,9 +111,8 @@ TEST(InMemoryEventBusConcurrencyTest, ConcurrentSubscribeAndPublish) {
     // Subscribers register concurrently while publish happens
     std::thread subscriber([&] {
         for (int i = 0; i < 10; ++i)
-            bus.subscribe<ItemCreatedEvent>([&](const ItemCreatedEvent&) {
-                received.fetch_add(1, std::memory_order_relaxed);
-            });
+            bus.subscribe<ItemCreatedEvent>(
+                [&](const ItemCreatedEvent&) { received.fetch_add(1, std::memory_order_relaxed); });
     });
 
     std::thread publisher([&] {

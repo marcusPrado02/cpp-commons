@@ -1,8 +1,9 @@
 #pragma once
-#include <cpp_commons/errors/domain_error.hpp>
 #include <functional>
 #include <stdexcept>
 #include <string>
+
+#include <cpp_commons/errors/domain_error.hpp>
 
 namespace cpp_commons::application {
 
@@ -22,4 +23,4 @@ auto validating_command_handler(Validator validator, Handler handler) {
     };
 }
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

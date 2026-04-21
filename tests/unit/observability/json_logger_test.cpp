@@ -1,9 +1,10 @@
-#include <json_logger.hpp>
-#include <gtest/gtest.h>
-#include <spdlog/sinks/ostream_sink.h>
-#include <fstream>
-#include <sstream>
 #include <filesystem>
+#include <fstream>
+#include <json_logger.hpp>
+#include <spdlog/sinks/ostream_sink.h>
+#include <sstream>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::observability;
 namespace fs = std::filesystem;
@@ -11,7 +12,7 @@ namespace fs = std::filesystem;
 // Helper: build a JsonLogger that writes to an in-memory stream
 static JsonLogger make_stream_logger(const std::string& name, std::ostringstream& oss) {
     auto sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
-    auto raw   = std::make_shared<spdlog::logger>(name, sink);
+    auto raw = std::make_shared<spdlog::logger>(name, sink);
     raw->set_pattern("%v");
     raw->set_level(spdlog::level::trace);
     return JsonLogger{name, raw};
@@ -103,8 +104,10 @@ TEST(JsonLoggerTest, WithFileLevelCanBeChanged) {
     spdlog::drop("svc-level-file");
 
     std::ifstream f(path);
-    std::string content((std::istreambuf_iterator<char>(f)),
-                         std::istreambuf_iterator<char>());
+    ASSERT_TRUE(f.is_open()) << "could not open " << path;
+    std::ostringstream oss;
+    oss << f.rdbuf();
+    std::string content = oss.str();
     EXPECT_EQ(content.find("filtered"), std::string::npos);
     EXPECT_NE(content.find("kept"), std::string::npos);
     fs::remove(path);

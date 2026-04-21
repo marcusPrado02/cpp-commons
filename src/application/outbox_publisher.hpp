@@ -1,11 +1,12 @@
 #pragma once
-#include <cpp_commons/kernel/domain_event.hpp>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+
+#include <cpp_commons/kernel/domain_event.hpp>
 
 namespace cpp_commons::application {
 
@@ -37,8 +38,7 @@ public:
     void store(Args&&... args) {
         std::lock_guard lock{mutex_};
         outbox_.push_back(
-            {std::type_index(typeid(E)),
-             std::make_unique<E>(std::forward<Args>(args)...)});
+            {std::type_index(typeid(E)), std::make_unique<E>(std::forward<Args>(args)...)});
     }
 
     // Publish all pending events to the bus, then clear. Thread-safe.
@@ -72,4 +72,4 @@ private:
     std::unordered_map<std::type_index, PublishFn> publishers_;
 };
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

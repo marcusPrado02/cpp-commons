@@ -1,20 +1,25 @@
+#include <string>
+
+#include <cpp_commons/kernel/identity.hpp>
+#include <cpp_commons/testing/builders.hpp>
 #include <cpp_commons/testing/fake_logger.hpp>
 #include <cpp_commons/testing/fake_metrics.hpp>
 #include <cpp_commons/testing/fake_repository.hpp>
-#include <cpp_commons/testing/builders.hpp>
-#include <cpp_commons/kernel/identity.hpp>
-#include <gtest/gtest.h>
-#include <string>
 
-namespace ct  = cpp_commons::testing;
-namespace ck  = cpp_commons::kernel;
+#include <gtest/gtest.h>
+
+namespace ct = cpp_commons::testing;
+namespace ck = cpp_commons::kernel;
 
 // ── FakeLogger ────────────────────────────────────────────────────────────────
 
 TEST(FakeLoggerTest, CapturesAllLevels) {
     ct::FakeLogger logger;
-    logger.trace("t"); logger.debug("d"); logger.info("i");
-    logger.warn("w");  logger.error("e");
+    logger.trace("t");
+    logger.debug("d");
+    logger.info("i");
+    logger.warn("w");
+    logger.error("e");
     EXPECT_EQ(logger.entries().size(), 5u);
     EXPECT_EQ(logger.entries()[0].level, "trace");
     EXPECT_EQ(logger.entries()[4].level, "error");
@@ -68,7 +73,7 @@ struct Tag {};
 using TestId = ck::StrongId<Tag>;
 
 struct Item {
-    TestId      id_;
+    TestId id_;
     std::string name;
     [[nodiscard]] const TestId& id() const noexcept { return id_; }
 };
@@ -106,17 +111,17 @@ TEST(FakeRepositoryTest, SaveOverwritesExisting) {
 // ── Builder ───────────────────────────────────────────────────────────────────
 
 struct Config {
-    int         timeout{30};
+    int timeout{30};
     std::string host{"localhost"};
-    bool        tls{false};
+    bool tls{false};
 };
 
 TEST(BuilderTest, AppliesStepsInOrder) {
     auto cfg = ct::Builder<Config>{}
-        .with([](Config& c) { c.timeout = 60; })
-        .with([](Config& c) { c.host = "prod.example.com"; })
-        .with([](Config& c) { c.tls = true; })
-        .build();
+                   .with([](Config& c) { c.timeout = 60; })
+                   .with([](Config& c) { c.host = "prod.example.com"; })
+                   .with([](Config& c) { c.tls = true; })
+                   .build();
 
     EXPECT_EQ(cfg.timeout, 60);
     EXPECT_EQ(cfg.host, "prod.example.com");

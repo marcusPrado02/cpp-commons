@@ -11,13 +11,15 @@ uint32_t Bulkhead::available() const noexcept {
 
 void Bulkhead::acquire() {
     std::lock_guard lk{mu_};
-    if (active_ >= max_) throw BulkheadFullError{"bulkhead capacity reached"};
+    if (active_ >= max_)
+        throw BulkheadFullError{"bulkhead capacity reached"};
     ++active_;
 }
 
 void Bulkhead::release() noexcept {
     std::lock_guard lk{mu_};
-    if (active_ > 0) --active_;
+    if (active_ > 0)
+        --active_;
 }
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

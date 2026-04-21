@@ -1,7 +1,8 @@
 #include <idempotency_middleware.hpp>
 #include <middleware_chain.hpp>
-#include <gtest/gtest.h>
 #include <string>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
 
@@ -48,8 +49,14 @@ TEST(IdempotencyMiddlewareTest, NoKeyPassesThrough) {
 
     HttpRequest req;  // no Idempotency-Key header
 
-    (void)chain.dispatch(req, [&](const HttpRequest&) { ++call_count; return HttpResponse::ok(""); });
-    (void)chain.dispatch(req, [&](const HttpRequest&) { ++call_count; return HttpResponse::ok(""); });
+    (void)chain.dispatch(req, [&](const HttpRequest&) {
+        ++call_count;
+        return HttpResponse::ok("");
+    });
+    (void)chain.dispatch(req, [&](const HttpRequest&) {
+        ++call_count;
+        return HttpResponse::ok("");
+    });
 
     EXPECT_EQ(call_count, 2);  // no caching without key
 }

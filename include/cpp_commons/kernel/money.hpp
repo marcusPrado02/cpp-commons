@@ -2,13 +2,15 @@
 /// @brief ISO 4217 monetary value — integer cents + currency code with overflow-safe arithmetic.
 #pragma once
 #include "value_object.hpp"
-#include <cpp_commons/errors/domain_error.hpp>
+
 #include <format>
 #include <limits>
 #include <stdexcept>
 #include <string>
 #include <string_view>
 #include <tuple>
+
+#include <cpp_commons/errors/domain_error.hpp>
 
 namespace cpp_commons::kernel {
 
@@ -19,12 +21,15 @@ struct CurrencyCode {
     constexpr explicit CurrencyCode(std::string_view sv) {
         if (sv.size() != 3)
             throw std::invalid_argument{"CurrencyCode must be 3 characters"};
-        code[0] = sv[0]; code[1] = sv[1]; code[2] = sv[2]; code[3] = '\0';
+        code[0] = sv[0];
+        code[1] = sv[1];
+        code[2] = sv[2];
+        code[3] = '\0';
     }
 
     [[nodiscard]] std::string_view view() const noexcept { return {code, 3}; }
     bool operator==(const CurrencyCode& o) const noexcept {
-        return code[0]==o.code[0] && code[1]==o.code[1] && code[2]==o.code[2];
+        return code[0] == o.code[0] && code[1] == o.code[1] && code[2] == o.code[2];
     }
     bool operator!=(const CurrencyCode& o) const noexcept { return !(*this == o); }
 };
@@ -35,10 +40,9 @@ struct CurrencyCode {
 /// Use `cents()` for exact arithmetic; `to_string()` for display formatting.
 class Money : public ValueObject<Money> {
 public:
-    Money(int64_t cents, CurrencyCode currency)
-        : cents_{cents}, currency_{currency} {}
+    Money(int64_t cents, CurrencyCode currency) : cents_{cents}, currency_{currency} {}
 
-    [[nodiscard]] int64_t     cents()    const noexcept { return cents_; }
+    [[nodiscard]] int64_t cents() const noexcept { return cents_; }
     [[nodiscard]] CurrencyCode currency() const noexcept { return currency_; }
 
     [[nodiscard]] auto fields() const noexcept {
@@ -46,8 +50,7 @@ public:
     }
 
     [[nodiscard]] std::string to_string() const {
-        return std::format("{} {}.{:02}", currency_.view(),
-                           cents_ / 100, std::abs(cents_ % 100));
+        return std::format("{} {}.{:02}", currency_.view(), cents_ / 100, std::abs(cents_ % 100));
     }
 
     [[nodiscard]] Money operator+(const Money& o) const {
@@ -62,13 +65,25 @@ public:
         return {cents_ - o.cents_, currency_};
     }
 
-    bool operator<(const Money& o)  const { check_same_currency(o); return cents_ < o.cents_; }
-    bool operator<=(const Money& o) const { check_same_currency(o); return cents_ <= o.cents_; }
-    bool operator>(const Money& o)  const { check_same_currency(o); return cents_ > o.cents_; }
-    bool operator>=(const Money& o) const { check_same_currency(o); return cents_ >= o.cents_; }
+    bool operator<(const Money& o) const {
+        check_same_currency(o);
+        return cents_ < o.cents_;
+    }
+    bool operator<=(const Money& o) const {
+        check_same_currency(o);
+        return cents_ <= o.cents_;
+    }
+    bool operator>(const Money& o) const {
+        check_same_currency(o);
+        return cents_ > o.cents_;
+    }
+    bool operator>=(const Money& o) const {
+        check_same_currency(o);
+        return cents_ >= o.cents_;
+    }
 
 private:
-    int64_t     cents_;
+    int64_t cents_;
     CurrencyCode currency_;
 
     void check_same_currency(const Money& o) const {
@@ -84,4 +99,4 @@ private:
     }
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

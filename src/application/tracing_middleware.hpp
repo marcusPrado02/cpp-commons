@@ -1,8 +1,10 @@
 #pragma once
-#include <cpp_commons/kernel/ports/tracer_port.hpp>
 #include "command_bus.hpp"
 #include "query_bus.hpp"
+
 #include <typeinfo>
+
+#include <cpp_commons/kernel/ports/tracer_port.hpp>
 
 namespace cpp_commons::application {
 
@@ -27,4 +29,4 @@ auto tracing_query_handler(Tracer& tracer, Handler handler) {
     };
 }
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

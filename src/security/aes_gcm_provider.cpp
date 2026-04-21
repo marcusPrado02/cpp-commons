@@ -1,9 +1,9 @@
 #include "aes_gcm_provider.hpp"
 
 #ifdef CPP_COMMONS_HAS_OPENSSL
+#include <cstring>
 #include <openssl/evp.h>
 #include <openssl/rand.h>
-#include <cstring>
 #endif
 
 namespace cpp_commons::security {
@@ -16,7 +16,7 @@ AesGcmProvider::AesGcmProvider(std::vector<uint8_t> key) : key_(std::move(key)) 
 #ifdef CPP_COMMONS_HAS_OPENSSL
 
 std::vector<uint8_t> AesGcmProvider::encrypt(std::string_view plaintext) const {
-    static constexpr int kIvLen  = 12;
+    static constexpr int kIvLen = 12;
     static constexpr int kTagLen = 16;
 
     std::vector<uint8_t> out(kIvLen + plaintext.size() + kTagLen);
@@ -28,10 +28,9 @@ std::vector<uint8_t> AesGcmProvider::encrypt(std::string_view plaintext) const {
     EVP_EncryptInit_ex(ctx, nullptr, nullptr, key_.data(), out.data());
 
     int len = 0;
-    EVP_EncryptUpdate(ctx,
-        out.data() + kIvLen, &len,
-        reinterpret_cast<const uint8_t*>(plaintext.data()),
-        static_cast<int>(plaintext.size()));
+    EVP_EncryptUpdate(ctx, out.data() + kIvLen, &len,
+                      reinterpret_cast<const uint8_t*>(plaintext.data()),
+                      static_cast<int>(plaintext.size()));
 
     int final_len = 0;
     EVP_EncryptFinal_ex(ctx, out.data() + kIvLen + len, &final_len);
@@ -41,7 +40,7 @@ std::vector<uint8_t> AesGcmProvider::encrypt(std::string_view plaintext) const {
 }
 
 std::string AesGcmProvider::decrypt(const std::vector<uint8_t>& ciphertext) const {
-    static constexpr int kIvLen  = 12;
+    static constexpr int kIvLen = 12;
     static constexpr int kTagLen = 16;
 
     if (ciphertext.size() < static_cast<std::size_t>(kIvLen + kTagLen))
@@ -56,18 +55,19 @@ std::string AesGcmProvider::decrypt(const std::vector<uint8_t>& ciphertext) cons
     EVP_DecryptInit_ex(ctx, nullptr, nullptr, key_.data(), ciphertext.data());
 
     int len = 0;
-    EVP_DecryptUpdate(ctx,
-        reinterpret_cast<uint8_t*>(plaintext.data()), &len,
-        ciphertext.data() + kIvLen, static_cast<int>(ct_len));
+    EVP_DecryptUpdate(ctx, reinterpret_cast<uint8_t*>(plaintext.data()), &len,
+                      ciphertext.data() + kIvLen, static_cast<int>(ct_len));
 
     // Set expected tag
     auto* tag_ptr = const_cast<uint8_t*>(ciphertext.data() + kIvLen + ct_len);
     EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, kTagLen, tag_ptr);
 
     int final_len = 0;
-    int ok = EVP_DecryptFinal_ex(ctx, reinterpret_cast<uint8_t*>(plaintext.data()) + len, &final_len);
+    int ok =
+        EVP_DecryptFinal_ex(ctx, reinterpret_cast<uint8_t*>(plaintext.data()) + len, &final_len);
     EVP_CIPHER_CTX_free(ctx);
-    if (ok <= 0) throw EncryptionError{"authentication tag mismatch"};
+    if (ok <= 0)
+        throw EncryptionError{"authentication tag mismatch"};
     return plaintext;
 }
 
@@ -83,4 +83,4 @@ std::string AesGcmProvider::decrypt(const std::vector<uint8_t>&) const {
 
 #endif
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

@@ -17,12 +17,14 @@ struct JwtClaims {
     nlohmann::json payload;
 
     [[nodiscard]] std::optional<std::string> subject() const {
-        if (!payload.contains("sub")) return std::nullopt;
+        if (!payload.contains("sub"))
+            return std::nullopt;
         return payload["sub"].get<std::string>();
     }
 
     [[nodiscard]] std::optional<std::string> issuer() const {
-        if (!payload.contains("iss")) return std::nullopt;
+        if (!payload.contains("iss"))
+            return std::nullopt;
         return payload["iss"].get<std::string>();
     }
 };
@@ -32,4 +34,4 @@ struct JwtClaims {
 // For production use behind an API gateway that already verified the signature.
 [[nodiscard]] JwtClaims decode_jwt(std::string_view token);
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

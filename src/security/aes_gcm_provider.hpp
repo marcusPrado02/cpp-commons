@@ -29,4 +29,4 @@ private:
     std::vector<uint8_t> key_;
 };
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

@@ -1,14 +1,22 @@
-#include <use_case.hpp>
 #include <pagination.hpp>
-#include <gtest/gtest.h>
 #include <string>
+#include <use_case.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::application;
 using namespace cpp_commons::kernel;
 
-struct AddInput  { int a; int b; };
-struct AddOutput { int sum; };
-struct AddError  { std::string msg; };
+struct AddInput {
+    int a;
+    int b;
+};
+struct AddOutput {
+    int sum;
+};
+struct AddError {
+    std::string msg;
+};
 
 struct AddUseCase : UseCase<AddInput, AddOutput, AddError> {
     Result execute(const AddInput& in) override {

@@ -1,9 +1,10 @@
-#include <cpp_commons/testing/matchers.hpp>
-#include <cpp_commons/kernel/result.hpp>
-#include <cpp_commons/kernel/option.hpp>
 #include <cpp_commons/errors/domain_error.hpp>
-#include <gtest/gtest.h>
+#include <cpp_commons/kernel/option.hpp>
+#include <cpp_commons/kernel/result.hpp>
+#include <cpp_commons/testing/matchers.hpp>
+
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::testing;
 using namespace cpp_commons::kernel;

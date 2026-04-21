@@ -1,17 +1,20 @@
 #include <mediator.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::application;
 
-struct ShipOrder  { std::string order_id; };
-struct GetStock   { std::string product_id; };
+struct ShipOrder {
+    std::string order_id;
+};
+struct GetStock {
+    std::string product_id;
+};
 
 TEST(MediatorTest, SendDispatchesCommand) {
     Mediator m;
     std::string shipped;
-    m.register_command<ShipOrder>([&](const ShipOrder& cmd) {
-        shipped = cmd.order_id;
-    });
+    m.register_command<ShipOrder>([&](const ShipOrder& cmd) { shipped = cmd.order_id; });
     m.send(ShipOrder{"order-7"});
     EXPECT_EQ(shipped, "order-7");
 }

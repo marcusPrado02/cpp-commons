@@ -1,8 +1,9 @@
 #pragma once
-#include <cpp_commons/errors/domain_error.hpp>
 #include <atomic>
 #include <chrono>
 #include <mutex>
+
+#include <cpp_commons/errors/domain_error.hpp>
 
 namespace cpp_commons::resilience {
 
@@ -23,7 +24,8 @@ public:
     [[nodiscard]] bool try_acquire(double cost) {
         std::lock_guard lock{mutex_};
         refill();
-        if (tokens_ < cost) return false;
+        if (tokens_ < cost)
+            return false;
         tokens_ -= cost;
         return true;
     }
@@ -57,4 +59,4 @@ private:
     std::mutex mutex_;
 };
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

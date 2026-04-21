@@ -1,6 +1,7 @@
 #pragma once
-#include "middleware_chain.hpp"
 #include "http_response.hpp"
+#include "middleware_chain.hpp"
+
 #include <cstddef>
 #include <stdexcept>
 #include <string>
@@ -15,24 +16,21 @@ inline Middleware body_limit_middleware(std::size_t max_bytes) {
             try {
                 auto declared = static_cast<std::size_t>(std::stoull(*cl));
                 if (declared > max_bytes)
-                    return HttpResponse::from_problem({
-                        "https://httpproblems.com/http-status/413",
-                        "Request Entity Too Large", 413,
-                        "Body exceeds maximum allowed size", ""
-                    });
-            } catch (const std::invalid_argument&) {}
-              catch (const std::out_of_range&)     {}
+                    return HttpResponse::from_problem({"https://httpproblems.com/http-status/413",
+                                                       "Request Entity Too Large", 413,
+                                                       "Body exceeds maximum allowed size", ""});
+            } catch (const std::invalid_argument&) {
+            } catch (const std::out_of_range&) {
+            }
         }
 
         if (req.body.size() > max_bytes)
-            return HttpResponse::from_problem({
-                "https://httpproblems.com/http-status/413",
-                "Request Entity Too Large", 413,
-                "Body exceeds maximum allowed size", ""
-            });
+            return HttpResponse::from_problem({"https://httpproblems.com/http-status/413",
+                                               "Request Entity Too Large", 413,
+                                               "Body exceeds maximum allowed size", ""});
 
         return next(req);
     };
 }
 
-} // namespace cpp_commons::web
+}  // namespace cpp_commons::web

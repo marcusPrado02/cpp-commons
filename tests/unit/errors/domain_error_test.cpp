@@ -1,6 +1,8 @@
-#include <cpp_commons/errors/domain_error.hpp>
-#include <gtest/gtest.h>
 #include <stdexcept>
+
+#include <cpp_commons/errors/domain_error.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::errors;
 

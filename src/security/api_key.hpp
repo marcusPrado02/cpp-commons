@@ -1,6 +1,7 @@
 #pragma once
-#include <cpp_commons/kernel/identity.hpp>
 #include <string>
+
+#include <cpp_commons/kernel/identity.hpp>
 
 namespace cpp_commons::security {
 
@@ -20,4 +21,4 @@ private:
     std::string raw_;
 };
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

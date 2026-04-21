@@ -1,7 +1,8 @@
 #include <jwt_decoder.hpp>
 #include <jwt_signer.hpp>
-#include <gtest/gtest.h>
 #include <string>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::security;
 
@@ -50,9 +51,9 @@ TEST(JwtDecoderAdversarialTest, AlgNoneTokenDecodesWithoutError) {
     // Header: {"alg":"none","typ":"JWT"}, payload: {"sub":"attacker"}
     // Callers are responsible for signature verification; decoder is explicitly non-verifying.
     const std::string token =
-        "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"   // {"alg":"none","typ":"JWT"}
-        ".eyJzdWIiOiJhdHRhY2tlciJ9"              // {"sub":"attacker"}
-        ".";                                       // empty signature
+        "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"  // {"alg":"none","typ":"JWT"}
+        ".eyJzdWIiOiJhdHRhY2tlciJ9"            // {"sub":"attacker"}
+        ".";                                   // empty signature
     EXPECT_NO_THROW({
         auto claims = decode_jwt(token);
         EXPECT_EQ(claims.header["alg"], "none");

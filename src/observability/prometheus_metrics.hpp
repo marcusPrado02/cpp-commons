@@ -1,5 +1,4 @@
 #pragma once
-#include <cpp_commons/kernel/ports/metrics_port.hpp>
 #include <atomic>
 #include <cmath>
 #include <mutex>
@@ -9,6 +8,8 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+
+#include <cpp_commons/kernel/ports/metrics_port.hpp>
 
 namespace cpp_commons::observability {
 
@@ -39,10 +40,11 @@ public:
         auto key = std::string{name};
         std::lock_guard lock{hist_mutex_};
         auto& h = histograms_[key];
-        h.sum   += value;
+        h.sum += value;
         h.count += 1;
         for (auto& bucket : h.buckets)
-            if (value <= bucket.upper_bound) ++bucket.count;
+            if (value <= bucket.upper_bound)
+                ++bucket.count;
     }
 
     // Produce the Prometheus text exposition format (for /metrics endpoint).
@@ -71,7 +73,7 @@ public:
                 out << name << "_bucket{le=\"" << b.upper_bound << "\"} " << b.count << '\n';
             }
             out << name << "_bucket{le=\"+Inf\"} " << h.count << '\n';
-            out << name << "_sum "   << h.sum   << '\n';
+            out << name << "_sum " << h.sum << '\n';
             out << name << "_count " << h.count << '\n';
         }
 
@@ -82,8 +84,10 @@ public:
     void reset() {
         {
             std::unique_lock lock{map_mutex_};
-            for (auto& [_, c] : counters_) c.store(0, std::memory_order_relaxed);
-            for (auto& [_, g] : gauges_)   g.store(0, std::memory_order_relaxed);
+            for (auto& [_, c] : counters_)
+                c.store(0, std::memory_order_relaxed);
+            for (auto& [_, g] : gauges_)
+                g.store(0, std::memory_order_relaxed);
         }
         std::lock_guard lock{hist_mutex_};
         histograms_.clear();
@@ -94,7 +98,8 @@ private:
         {
             std::shared_lock lock{map_mutex_};
             auto it = counters_.find(key);
-            if (it != counters_.end()) return it->second;
+            if (it != counters_.end())
+                return it->second;
         }
         std::unique_lock lock{map_mutex_};
         return counters_[key];  // default-init to 0
@@ -104,20 +109,23 @@ private:
         {
             std::shared_lock lock{map_mutex_};
             auto it = gauges_.find(key);
-            if (it != gauges_.end()) return it->second;
+            if (it != gauges_.end())
+                return it->second;
         }
         std::unique_lock lock{map_mutex_};
         return gauges_[key];
     }
 
-    struct Bucket { double upper_bound; uint64_t count{0}; };
+    struct Bucket {
+        double upper_bound;
+        uint64_t count{0};
+    };
     struct Histogram {
-        double   sum{0.0};
+        double sum{0.0};
         uint64_t count{0};
         // Default buckets in milliseconds (common for latency metrics).
-        std::vector<Bucket> buckets{
-            {1}, {5}, {10}, {25}, {50}, {100}, {250}, {500}, {1000}, {5000}
-        };
+        std::vector<Bucket> buckets{{1},   {5},   {10},  {25},   {50},
+                                    {100}, {250}, {500}, {1000}, {5000}};
     };
 
     std::unordered_map<std::string, std::atomic<uint64_t>> counters_;
@@ -129,4 +137,4 @@ private:
 
 static_assert(kernel::MetricsPort<PrometheusMetrics>);
 
-} // namespace cpp_commons::observability
+}  // namespace cpp_commons::observability

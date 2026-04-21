@@ -71,7 +71,7 @@ FetchContent_Declare(googlebenchmark
 
 FetchContent_Declare(yaml_cpp
     GIT_REPOSITORY https://github.com/jbeder/yaml-cpp.git
-    GIT_TAG        0.8.0
+    GIT_TAG        yaml-cpp-0.8.0
     GIT_SHALLOW    TRUE
 )
 
@@ -100,10 +100,14 @@ target_compile_definitions(asio_interface INTERFACE
 # spdlog
 FetchContent_MakeAvailable(spdlog)
 
-# yaml-cpp
+# yaml-cpp — suppress its own -Wshadow violations via SYSTEM include
 set(YAML_CPP_BUILD_TOOLS OFF CACHE BOOL "" FORCE)
 set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(yaml_cpp)
+get_target_property(_yaml_includes yaml-cpp INTERFACE_INCLUDE_DIRECTORIES)
+set_target_properties(yaml-cpp PROPERTIES
+    INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${_yaml_includes}"
+)
 
 # OpenSSL (system)
 find_package(OpenSSL QUIET)

@@ -1,7 +1,8 @@
 #pragma once
-#include "middleware_chain.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+#include "middleware_chain.hpp"
+
 #include <chrono>
 #include <mutex>
 #include <optional>
@@ -23,9 +24,7 @@ struct IdempotencyEntry {
 //
 // Uses the "Idempotency-Key" request header (Stripe-compatible).
 // Requests without the header pass through unchanged.
-inline Middleware idempotency_middleware(
-    std::chrono::seconds ttl = std::chrono::seconds{3600})
-{
+inline Middleware idempotency_middleware(std::chrono::seconds ttl = std::chrono::seconds{3600}) {
     struct Cache {
         std::unordered_map<std::string, IdempotencyEntry> entries;
         std::mutex mutex;
@@ -55,12 +54,12 @@ inline Middleware idempotency_middleware(
         {
             std::lock_guard lock{cache->mutex};
             cache->entries.insert_or_assign(key, IdempotencyEntry{
-                response,
-                now + ttl,
-            });
+                                                     response,
+                                                     now + ttl,
+                                                 });
         }
         return response;
     };
 }
 
-} // namespace cpp_commons::web
+}  // namespace cpp_commons::web

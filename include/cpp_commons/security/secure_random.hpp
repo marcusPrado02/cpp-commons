@@ -18,7 +18,8 @@ public:
     // Returns `byte_count` cryptographically secure random bytes.
     static std::string generate_bytes(std::size_t byte_count) {
         std::ifstream urandom{"/dev/urandom", std::ios::binary};
-        if (!urandom) throw std::runtime_error{"SecureRandom: cannot open /dev/urandom"};
+        if (!urandom)
+            throw std::runtime_error{"SecureRandom: cannot open /dev/urandom"};
         std::string buf(byte_count, '\0');
         if (!urandom.read(buf.data(), static_cast<std::streamsize>(byte_count)))
             throw std::runtime_error{"SecureRandom: short read from /dev/urandom"};
@@ -46,11 +47,13 @@ private:
 
             out += kAlphabet[(b0 >> 2) & 0x3F];
             out += kAlphabet[((b0 & 0x03) << 4) | (b1 >> 4)];
-            if (i + 1 < data.size()) out += kAlphabet[((b1 & 0x0F) << 2) | (b2 >> 6)];
-            if (i + 2 < data.size()) out += kAlphabet[b2 & 0x3F];
+            if (i + 1 < data.size())
+                out += kAlphabet[((b1 & 0x0F) << 2) | (b2 >> 6)];
+            if (i + 2 < data.size())
+                out += kAlphabet[b2 & 0x3F];
         }
         return out;
     }
 };
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

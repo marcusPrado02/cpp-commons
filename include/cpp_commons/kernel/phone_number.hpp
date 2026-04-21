@@ -2,10 +2,12 @@
 /// @brief E.164 phone number value object — construction only via `PhoneNumber::parse()`.
 #pragma once
 #include "value_object.hpp"
-#include <cpp_commons/kernel/result.hpp>
-#include <cpp_commons/errors/domain_error.hpp>
+
 #include <string>
 #include <string_view>
+
+#include <cpp_commons/errors/domain_error.hpp>
+#include <cpp_commons/kernel/result.hpp>
 
 namespace cpp_commons::kernel {
 
@@ -14,8 +16,8 @@ namespace cpp_commons::kernel {
 /// `parse()` validates the format and returns `Result<PhoneNumber, ValidationError>`.
 class PhoneNumber : public ValueObject<PhoneNumber> {
 public:
-    [[nodiscard]] static Result<PhoneNumber, errors::ValidationError>
-    parse(std::string_view input) {
+    [[nodiscard]] static Result<PhoneNumber, errors::ValidationError> parse(
+        std::string_view input) {
         if (input.empty() || input[0] != '+')
             return Result<PhoneNumber, errors::ValidationError>::err(
                 errors::ValidationError{"Phone number must start with '+'"});
@@ -31,17 +33,16 @@ public:
                     errors::ValidationError{"Phone number must contain only digits after '+'"});
         }
 
-        return Result<PhoneNumber, errors::ValidationError>::ok(
-            PhoneNumber{std::string{input}});
+        return Result<PhoneNumber, errors::ValidationError>::ok(PhoneNumber{std::string{input}});
     }
 
-    [[nodiscard]] const std::string& value()     const noexcept { return number_; }
-    [[nodiscard]] std::string        to_string() const { return number_; }
-    [[nodiscard]] auto               fields()    const noexcept { return std::tie(number_); }
+    [[nodiscard]] const std::string& value() const noexcept { return number_; }
+    [[nodiscard]] std::string to_string() const { return number_; }
+    [[nodiscard]] auto fields() const noexcept { return std::tie(number_); }
 
 private:
     explicit PhoneNumber(std::string number) : number_{std::move(number)} {}
     std::string number_;
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

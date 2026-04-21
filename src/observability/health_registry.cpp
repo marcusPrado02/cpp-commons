@@ -1,4 +1,5 @@
 #include "health_registry.hpp"
+
 #include <algorithm>
 
 namespace cpp_commons::observability {
@@ -15,8 +16,7 @@ HealthReport HealthRegistry::run_all() const {
         auto check = fn();
         if (check.status == HealthStatus::Down) {
             report.overall = HealthStatus::Down;
-        } else if (check.status == HealthStatus::Degraded &&
-                   report.overall == HealthStatus::Up) {
+        } else if (check.status == HealthStatus::Degraded && report.overall == HealthStatus::Up) {
             report.overall = HealthStatus::Degraded;
         }
         report.checks.push_back(std::move(check));
@@ -25,4 +25,4 @@ HealthReport HealthRegistry::run_all() const {
     return report;
 }
 
-} // namespace cpp_commons::observability
+}  // namespace cpp_commons::observability

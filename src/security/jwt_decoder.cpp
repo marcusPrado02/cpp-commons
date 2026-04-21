@@ -1,4 +1,5 @@
 #include "jwt_decoder.hpp"
+
 #include <array>
 
 namespace cpp_commons::security {
@@ -11,11 +12,16 @@ std::string base64url_decode(std::string_view encoded) {
     out.reserve(encoded.size() * 3 / 4);
 
     auto decode_char = [](char c) -> int {
-        if (c >= 'A' && c <= 'Z') return c - 'A';
-        if (c >= 'a' && c <= 'z') return c - 'a' + 26;
-        if (c >= '0' && c <= '9') return c - '0' + 52;
-        if (c == '+' || c == '-') return 62;
-        if (c == '/' || c == '_') return 63;
+        if (c >= 'A' && c <= 'Z')
+            return c - 'A';
+        if (c >= 'a' && c <= 'z')
+            return c - 'a' + 26;
+        if (c >= '0' && c <= '9')
+            return c - '0' + 52;
+        if (c == '+' || c == '-')
+            return 62;
+        if (c == '/' || c == '_')
+            return 63;
         return -1;
     };
 
@@ -23,7 +29,8 @@ std::string base64url_decode(std::string_view encoded) {
     int bits = 0;
     for (char c : encoded) {
         int val = decode_char(c);
-        if (val < 0) continue;
+        if (val < 0)
+            continue;
         buf = (buf << 6) | val;
         bits += 6;
         if (bits >= 8) {
@@ -34,17 +41,17 @@ std::string base64url_decode(std::string_view encoded) {
     return out;
 }
 
-} // namespace
+}  // namespace
 
 JwtClaims decode_jwt(std::string_view token) {
-    auto first_dot  = token.find('.');
+    auto first_dot = token.find('.');
     if (first_dot == std::string_view::npos)
         throw JwtError{"malformed JWT: missing first dot"};
     auto second_dot = token.find('.', first_dot + 1);
     if (second_dot == std::string_view::npos)
         throw JwtError{"malformed JWT: missing second dot"};
 
-    auto header_b64  = token.substr(0, first_dot);
+    auto header_b64 = token.substr(0, first_dot);
     auto payload_b64 = token.substr(first_dot + 1, second_dot - first_dot - 1);
 
     try {
@@ -57,4 +64,4 @@ JwtClaims decode_jwt(std::string_view token) {
     }
 }
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

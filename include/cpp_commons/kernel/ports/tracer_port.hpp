@@ -7,10 +7,10 @@
 namespace cpp_commons::kernel {
 
 /// @brief Any type exposing `start_span(name)` and `end_span()` satisfies this port.
-template<typename T>
+template <typename T>
 concept TracerPort = requires(T t, std::string_view name) {
     { t.start_span(name) } -> std::same_as<void>;
-    { t.end_span()       } -> std::same_as<void>;
+    { t.end_span() } -> std::same_as<void>;
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

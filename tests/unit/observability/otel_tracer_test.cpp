@@ -1,7 +1,8 @@
 #include <otel_tracer.hpp>
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::observability::OtelTracer;
 using cpp_commons::observability::SpanRecord;

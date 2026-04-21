@@ -1,6 +1,7 @@
 #include <api_key.hpp>
-#include <pii_redactor.hpp>
 #include <jwt_decoder.hpp>
+#include <pii_redactor.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::security;
@@ -84,10 +85,10 @@ TEST(JwtDecoderAdversarial, InvalidJsonPayloadThrows) {
 
 TEST(JwtDecoderAdversarial, ExtraDotsDoNotThrow) {
     // Extra segments are accepted (signature segment can be non-empty)
-    EXPECT_NO_THROW(decode_jwt(
-        "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
-        ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
-        ".fakesig"));
+    EXPECT_NO_THROW(
+        decode_jwt("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0"
+                   ".eyJzdWIiOiJ1c2VyLTQyIiwiaXNzIjoidGVzdCJ9"
+                   ".fakesig"));
 }
 
 TEST(JwtDecoderAdversarial, VeryLongTokenDoesNotCrash) {

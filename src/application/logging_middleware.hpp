@@ -1,9 +1,11 @@
 #pragma once
-#include <cpp_commons/kernel/ports/logger_port.hpp>
 #include "command_bus.hpp"
 #include "query_bus.hpp"
+
 #include <chrono>
 #include <format>
+
+#include <cpp_commons/kernel/ports/logger_port.hpp>
 
 namespace cpp_commons::application {
 
@@ -15,7 +17,8 @@ auto logging_command_handler(Logger& log, Handler handler) {
         log.debug(std::format("command {} started", typeid(Cmd).name()));
         h(cmd);
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                      std::chrono::steady_clock::now() - t0).count();
+                      std::chrono::steady_clock::now() - t0)
+                      .count();
         log.debug(std::format("command {} finished in {}ms", typeid(Cmd).name(), ms));
     };
 }
@@ -28,10 +31,11 @@ auto logging_query_handler(Logger& log, Handler handler) {
         log.debug(std::format("query {} started", typeid(Query).name()));
         auto result = h(q);
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                      std::chrono::steady_clock::now() - t0).count();
+                      std::chrono::steady_clock::now() - t0)
+                      .count();
         log.debug(std::format("query {} finished in {}ms", typeid(Query).name(), ms));
         return result;
     };
 }
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

@@ -1,7 +1,8 @@
 #pragma once
 #include "jwt_decoder.hpp"
-#include <nlohmann/json.hpp>
+
 #include <chrono>
+#include <nlohmann/json.hpp>
 #include <string>
 #include <string_view>
 
@@ -30,4 +31,4 @@ private:
     static std::string hmac_sha256(std::string_view key, std::string_view msg);
 };
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

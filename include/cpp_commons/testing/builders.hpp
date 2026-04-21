@@ -7,7 +7,7 @@
 namespace cpp_commons::testing {
 
 /// @brief Fluent builder: chain `with([](T& o){…})` calls, then `build()`.
-template<typename T>
+template <typename T>
 class Builder {
 public:
     Builder& with(std::function<void(T&)> fn) {
@@ -17,7 +17,8 @@ public:
 
     [[nodiscard]] T build() const {
         T obj{};
-        for (const auto& step : steps_) step(obj);
+        for (const auto& step : steps_)
+            step(obj);
         return obj;
     }
 
@@ -25,4 +26,4 @@ private:
     std::vector<std::function<void(T&)>> steps_;
 };
 
-} // namespace cpp_commons::testing
+}  // namespace cpp_commons::testing

@@ -1,4 +1,5 @@
 #include <cpp_commons/kernel/domain_event.hpp>
+
 #include <gtest/gtest.h>
 
 using cpp_commons::kernel::DomainEvent;
@@ -8,6 +9,7 @@ public:
     explicit OrderCreated(std::string order_id)
         : DomainEvent{"OrderCreated"}, order_id_{std::move(order_id)} {}
     const std::string& order_id() const { return order_id_; }
+
 private:
     std::string order_id_;
 };
@@ -25,7 +27,7 @@ TEST(DomainEventTest, HasEventType) {
 TEST(DomainEventTest, OccurredAtIsSet) {
     auto before = std::chrono::system_clock::now();
     OrderCreated e{"ord-1"};
-    auto after  = std::chrono::system_clock::now();
+    auto after = std::chrono::system_clock::now();
     EXPECT_GE(e.occurred_at(), before);
     EXPECT_LE(e.occurred_at(), after);
 }

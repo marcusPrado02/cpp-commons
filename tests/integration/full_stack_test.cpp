@@ -1,20 +1,22 @@
-#include <correlation_context.hpp>
-#include <json_logger.hpp>
+#include <auth_middleware.hpp>
 #include <circuit_breaker.hpp>
-#include <retry_policy.hpp>
 #include <command_bus.hpp>
-#include <query_bus.hpp>
+#include <correlation_context.hpp>
+#include <correlation_middleware.hpp>
 #include <http_request.hpp>
 #include <http_response.hpp>
+#include <json_logger.hpp>
 #include <middleware_chain.hpp>
-#include <auth_middleware.hpp>
-#include <correlation_middleware.hpp>
-#include <use_case.hpp>
-#include <cpp_commons/kernel/result.hpp>
-#include <cpp_commons/errors/domain_error.hpp>
-#include <gtest/gtest.h>
-#include <string>
+#include <query_bus.hpp>
+#include <retry_policy.hpp>
 #include <stdexcept>
+#include <string>
+#include <use_case.hpp>
+
+#include <cpp_commons/errors/domain_error.hpp>
+#include <cpp_commons/kernel/result.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons;
 
@@ -41,35 +43,38 @@ TEST(FullStackIntegration, CorrelationPropagatesIntoLogger) {
 TEST(FullStackIntegration, RetryTripsCircuitBreaker) {
     resilience::CircuitBreaker cb{resilience::CircuitBreakerConfig{
         .failure_threshold = 2,
-        .open_duration     = std::chrono::seconds{60},
+        .open_duration = std::chrono::seconds{60},
     }};
 
     resilience::RetryConfig retry{
-        .max_attempts  = 3,
+        .max_attempts = 3,
         .initial_delay = std::chrono::milliseconds{0},
     };
 
     // After 2 failures the breaker opens; the 3rd retry hits CircuitOpenError.
     int calls = 0;
-    EXPECT_THROW(
-        resilience::with_retry(retry, [&] {
-            return cb.call([&]() -> int {
-                ++calls;
-                throw std::runtime_error{"always fails"};
-            });
-        }),
-        resilience::RetryExhausted);
+    EXPECT_THROW(resilience::with_retry(retry,
+                                        [&] {
+                                            return cb.call([&]() -> int {
+                                                ++calls;
+                                                throw std::runtime_error{"always fails"};
+                                            });
+                                        }),
+                 resilience::RetryExhausted);
 
     EXPECT_TRUE(cb.is_open());
 }
 
 // ── Integration: CommandBus + UseCase + CorrelationScope ─────────────────────
 
-struct CreateItemCmd { std::string name; };
-struct ItemCreated   { std::string id; };
+struct CreateItemCmd {
+    std::string name;
+};
+struct ItemCreated {
+    std::string id;
+};
 
-struct CreateItemUseCase
-    : application::UseCase<CreateItemCmd, ItemCreated, errors::DomainError> {
+struct CreateItemUseCase : application::UseCase<CreateItemCmd, ItemCreated, errors::DomainError> {
     Result execute(const CreateItemCmd& cmd) override {
         if (cmd.name.empty())
             return Result::err(errors::InvariantViolationError{"name required"});
@@ -87,7 +92,8 @@ TEST(FullStackIntegration, CommandBusDispatchesUseCase) {
 
     bus.register_handler<CreateItemCmd>([&](const CreateItemCmd& cmd) {
         auto r = uc.execute(cmd);
-        if (r.is_ok()) created_id = r.value().id;
+        if (r.is_ok())
+            created_id = r.value().id;
     });
 
     bus.send(CreateItemCmd{"widget"});
@@ -99,18 +105,16 @@ TEST(FullStackIntegration, CommandBusDispatchesUseCase) {
 TEST(FullStackIntegration, WebMiddlewarePipelineEnforcesAuth) {
     web::MiddlewareChain chain;
     chain.use(web::correlation_middleware());
-    chain.use(web::auth_middleware([](const std::string& token) {
-        return token == "valid-token";
-    }));
+    chain.use(
+        web::auth_middleware([](const std::string& token) { return token == "valid-token"; }));
 
     // Request without token → 401
     {
         web::HttpRequest req;
         req.method = web::HttpMethod::Get;
-        req.path   = "/items";
-        auto resp = chain.dispatch(req, [](const web::HttpRequest&) {
-            return web::HttpResponse::ok(R"({"items":[]})");
-        });
+        req.path = "/items";
+        auto resp = chain.dispatch(
+            req, [](const web::HttpRequest&) { return web::HttpResponse::ok(R"({"items":[]})"); });
         EXPECT_EQ(resp.status_code, 401);
     }
 
@@ -118,9 +122,9 @@ TEST(FullStackIntegration, WebMiddlewarePipelineEnforcesAuth) {
     {
         web::HttpRequest req;
         req.method = web::HttpMethod::Get;
-        req.path   = "/items";
+        req.path = "/items";
         req.headers["Authorization"] = "Bearer valid-token";
-        req.headers["X-Tenant-ID"]   = "tenant-y";
+        req.headers["X-Tenant-ID"] = "tenant-y";
         auto resp = chain.dispatch(req, [](const web::HttpRequest&) {
             // Inside the handler the correlation scope is active.
             EXPECT_EQ(observability::current_correlation().tenant_id, "tenant-y");

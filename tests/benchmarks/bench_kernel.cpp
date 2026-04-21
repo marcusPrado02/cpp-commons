@@ -1,8 +1,9 @@
-#include <benchmark/benchmark.h>
-#include <cpp_commons/kernel/identity.hpp>
-#include <cpp_commons/kernel/result.hpp>
-#include <cpp_commons/kernel/option.hpp>
 #include <cpp_commons/errors/domain_error.hpp>
+#include <cpp_commons/kernel/identity.hpp>
+#include <cpp_commons/kernel/option.hpp>
+#include <cpp_commons/kernel/result.hpp>
+
+#include <benchmark/benchmark.h>
 
 using namespace cpp_commons::kernel;
 using namespace cpp_commons::errors;
@@ -39,9 +40,7 @@ BENCHMARK(BM_ResultOkConstruct);
 static void BM_ResultAndThen(benchmark::State& state) {
     auto r = Result<int, DomainError>::ok(1);
     for (auto _ : state) {
-        auto r2 = r.and_then([](int v) {
-            return tl::expected<int, DomainError>{v + 1};
-        });
+        auto r2 = r.and_then([](int v) { return tl::expected<int, DomainError>{v + 1}; });
         benchmark::DoNotOptimize(r2);
     }
 }

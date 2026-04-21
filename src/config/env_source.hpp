@@ -1,7 +1,7 @@
 #pragma once
+#include <cstdlib>
 #include <optional>
 #include <string>
-#include <cstdlib>
 
 namespace cpp_commons::config {
 
@@ -16,7 +16,8 @@ public:
     [[nodiscard]] std::optional<std::string> get(const std::string& key) const {
         auto full_key = prefix_ + key;
         const char* val = std::getenv(full_key.c_str());  // NOLINT(concurrency-mt-unsafe)
-        if (!val) return std::nullopt;
+        if (!val)
+            return std::nullopt;
         return std::string{val};
     }
 
@@ -26,4 +27,4 @@ private:
     std::string prefix_;
 };
 
-} // namespace cpp_commons::config
+}  // namespace cpp_commons::config

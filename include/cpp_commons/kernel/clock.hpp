@@ -7,10 +7,10 @@
 namespace cpp_commons::kernel {
 
 using TimePoint = std::chrono::system_clock::time_point;
-using Duration  = std::chrono::nanoseconds;
+using Duration = std::chrono::nanoseconds;
 
 /// @brief Constraint: any type with a `now()` returning `TimePoint` satisfies `Clock`.
-template<typename T>
+template <typename T>
 concept Clock = requires(const T t) {
     { t.now() } -> std::same_as<TimePoint>;
 };
@@ -18,9 +18,7 @@ concept Clock = requires(const T t) {
 /// @brief Production clock — delegates to `std::chrono::system_clock::now()`.
 class SystemClock {
 public:
-    [[nodiscard]] TimePoint now() const noexcept {
-        return std::chrono::system_clock::now();
-    }
+    [[nodiscard]] TimePoint now() const noexcept { return std::chrono::system_clock::now(); }
 };
 static_assert(Clock<SystemClock>);
 
@@ -33,7 +31,7 @@ public:
 
     void set(TimePoint t) noexcept { now_ = t; }
 
-    template<typename Rep, typename Period>
+    template <typename Rep, typename Period>
     void advance(std::chrono::duration<Rep, Period> d) {
         now_ += std::chrono::duration_cast<Duration>(d);
     }
@@ -43,4 +41,4 @@ private:
 };
 static_assert(Clock<FrozenClock>);
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

@@ -1,8 +1,9 @@
+#include <atomic>
 #include <rate_limiter.hpp>
-#include <gtest/gtest.h>
 #include <thread>
 #include <vector>
-#include <atomic>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::resilience::RateLimiter;
 
@@ -14,13 +15,15 @@ TEST(RateLimiterTest, AllowsUpToMaxTokens) {
 
 TEST(RateLimiterTest, DeniesWhenExhausted) {
     RateLimiter limiter{3.0, 0.0};  // 3 max, no refill
-    for (int i = 0; i < 3; ++i) (void)limiter.try_acquire();
+    for (int i = 0; i < 3; ++i)
+        (void)limiter.try_acquire();
     EXPECT_FALSE(limiter.try_acquire());
 }
 
 TEST(RateLimiterTest, ResetRestoresFullCapacity) {
     RateLimiter limiter{3.0, 0.0};
-    for (int i = 0; i < 3; ++i) (void)limiter.try_acquire();
+    for (int i = 0; i < 3; ++i)
+        (void)limiter.try_acquire();
     limiter.reset();
     EXPECT_TRUE(limiter.try_acquire());
 }
@@ -48,9 +51,11 @@ TEST(RateLimiterTest, ThreadSafeUnderContention) {
     for (int i = 0; i < 8; ++i) {
         threads.emplace_back([&] {
             for (int j = 0; j < 20; ++j)
-                if (limiter.try_acquire()) ++allowed;
+                if (limiter.try_acquire())
+                    ++allowed;
         });
     }
-    for (auto& t : threads) t.join();
+    for (auto& t : threads)
+        t.join();
     EXPECT_LE(allowed.load(), 100);
 }

@@ -1,4 +1,5 @@
 #include <correlation_context.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::observability;
@@ -64,13 +65,13 @@ TEST(CorrelationContextTest, TraceparentRoundTrip) {
     CorrelationContext ctx2;
     EXPECT_TRUE(ctx2.set_traceparent(tp));
     EXPECT_EQ(ctx2.trace_id, ctx.trace_id);
-    EXPECT_EQ(ctx2.span_id,  ctx.span_id);
+    EXPECT_EQ(ctx2.span_id, ctx.span_id);
 }
 
 TEST(CorrelationContextTest, TraceparentFormat) {
     CorrelationContext ctx;
     ctx.trace_id = "4bf92f3577b34da6a3ce929d0e0e4736";
-    ctx.span_id  = "00f067aa0ba902b7";
+    ctx.span_id = "00f067aa0ba902b7";
     auto tp = ctx.traceparent();
     EXPECT_EQ(tp, "00-4bf92f3577b34da6a3ce929d0e0e4736-00f067aa0ba902b7-01");
 }

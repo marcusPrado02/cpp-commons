@@ -1,4 +1,5 @@
 #include <yaml_source.hpp>
+
 #include <gtest/gtest.h>
 
 using cpp_commons::config::YamlSource;

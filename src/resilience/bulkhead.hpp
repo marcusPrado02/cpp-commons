@@ -36,4 +36,4 @@ private:
     uint32_t active_{0};
 };
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

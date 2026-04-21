@@ -20,4 +20,4 @@ auto with_timeout(std::chrono::milliseconds limit, Fn&& fn) -> decltype(fn()) {
     return fut.get();
 }
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

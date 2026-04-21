@@ -1,6 +1,6 @@
 #pragma once
-#include <cpp_commons/kernel/ports/tracer_port.hpp>
 #include "correlation_context.hpp"
+
 #include <atomic>
 #include <chrono>
 #include <cstdint>
@@ -11,6 +11,8 @@
 #include <string>
 #include <string_view>
 #include <vector>
+
+#include <cpp_commons/kernel/ports/tracer_port.hpp>
 
 namespace cpp_commons::observability {
 
@@ -42,13 +44,13 @@ public:
 
     // Exporter is called once per completed span, from end_span().
     explicit OtelTracer(Exporter exporter = nullptr)
-        : exporter_(exporter ? std::move(exporter) : [](SpanRecord){}) {}
+        : exporter_(exporter ? std::move(exporter) : [](SpanRecord) {}) {}
 
     void start_span(std::string_view name) {
         std::lock_guard lock{mutex_};
         ActiveSpan span;
-        span.record.name   = std::string{name};
-        span.record.start  = std::chrono::steady_clock::now();
+        span.record.name = std::string{name};
+        span.record.start = std::chrono::steady_clock::now();
 
         const auto& ctx = current_correlation();
         if (!ctx.empty()) {
@@ -65,7 +67,8 @@ public:
 
     void end_span() {
         std::lock_guard lock{mutex_};
-        if (stack_.empty()) return;
+        if (stack_.empty())
+            return;
         auto& top = stack_.back();
         top.record.end = std::chrono::steady_clock::now();
         exporter_(top.record);
@@ -73,7 +76,9 @@ public:
     }
 
 private:
-    struct ActiveSpan { SpanRecord record; };
+    struct ActiveSpan {
+        SpanRecord record;
+    };
 
     static std::string generate_id(std::size_t bytes) {
         // Deterministic for testing: use a simple counter.
@@ -94,4 +99,4 @@ private:
 
 static_assert(kernel::TracerPort<OtelTracer>);
 
-} // namespace cpp_commons::observability
+}  // namespace cpp_commons::observability

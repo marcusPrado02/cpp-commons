@@ -1,10 +1,11 @@
+#include <chrono>
+#include <cors_middleware.hpp>
 #include <http_request.hpp>
 #include <http_response.hpp>
 #include <middleware_chain.hpp>
-#include <cors_middleware.hpp>
-#include <gtest/gtest.h>
-#include <chrono>
 #include <stdexcept>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
 
@@ -72,9 +73,7 @@ TEST(HttpResponseTest, FromProblemSetsCorrectStatus) {
 TEST(MiddlewareChainTest, ExecutesFinalHandler) {
     MiddlewareChain chain;
     HttpRequest req;
-    auto resp = chain.dispatch(req, [](const HttpRequest&) {
-        return HttpResponse::ok("hello");
-    });
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("hello"); });
     EXPECT_EQ(resp.status_code, 200);
     EXPECT_EQ(resp.body, "hello");
 }
@@ -97,20 +96,19 @@ TEST(MiddlewareChainTest, MiddlewareRunsInOrder) {
     });
 
     HttpRequest req;
-    [[maybe_unused]] auto _ = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok(""); });
+    [[maybe_unused]] auto _ =
+        chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok(""); });
     EXPECT_EQ(log, "ABB'A'");
 }
 
 TEST(MiddlewareChainTest, MiddlewareCanShortCircuit) {
     MiddlewareChain chain;
-    chain.use([](const HttpRequest&, const Handler&) {
-        return HttpResponse{401, {}, "Unauthorized"};
-    });
+    chain.use(
+        [](const HttpRequest&, const Handler&) { return HttpResponse{401, {}, "Unauthorized"}; });
 
     HttpRequest req;
-    auto resp = chain.dispatch(req, [](const HttpRequest&) {
-        return HttpResponse::ok("should not reach");
-    });
+    auto resp = chain.dispatch(
+        req, [](const HttpRequest&) { return HttpResponse::ok("should not reach"); });
     EXPECT_EQ(resp.status_code, 401);
 }
 
@@ -128,11 +126,11 @@ TEST(MiddlewareChainTest, ExceptionFromHandlerPropagatesThroughMiddlewares) {
     });
 
     HttpRequest req;
-    EXPECT_THROW(
-        chain.dispatch(req, [](const HttpRequest&) -> HttpResponse {
-            throw std::runtime_error{"handler blew up"};
-        }),
-        std::runtime_error);
+    EXPECT_THROW(chain.dispatch(req,
+                                [](const HttpRequest&) -> HttpResponse {
+                                    throw std::runtime_error{"handler blew up"};
+                                }),
+                 std::runtime_error);
     EXPECT_TRUE(cleanup_ran);
 }
 
@@ -142,7 +140,7 @@ TEST(MiddlewareChainTest, MiddlewareCanMaintainStatePerRequest) {
     // Each call gets its own start_time capture — state is per-invocation, not shared.
     chain.use([](const HttpRequest& r, const Handler& next) -> HttpResponse {
         auto start = std::chrono::steady_clock::now();
-        auto resp  = next(r);
+        auto resp = next(r);
         auto elapsed = std::chrono::steady_clock::now() - start;
         // elapsed is local to this invocation — proves per-request isolation.
         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();

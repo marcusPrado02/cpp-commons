@@ -1,14 +1,15 @@
 #include <outbox_publisher.hpp>
-#include <cpp_commons/testing/in_memory_event_bus.hpp>
+
 #include <cpp_commons/kernel/domain_event.hpp>
+#include <cpp_commons/testing/in_memory_event_bus.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::application;
 
 struct OrderPlaced : cpp_commons::kernel::DomainEvent {
     int order_id{};
-    explicit OrderPlaced(int id)
-        : cpp_commons::kernel::DomainEvent{"OrderPlaced"}, order_id{id} {}
+    explicit OrderPlaced(int id) : cpp_commons::kernel::DomainEvent{"OrderPlaced"}, order_id{id} {}
 };
 
 struct PaymentReceived : cpp_commons::kernel::DomainEvent {

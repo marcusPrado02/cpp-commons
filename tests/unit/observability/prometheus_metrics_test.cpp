@@ -1,9 +1,10 @@
-#include <prometheus_metrics.hpp>
-#include <gtest/gtest.h>
-#include <thread>
 #include <atomic>
-#include <vector>
+#include <prometheus_metrics.hpp>
 #include <string>
+#include <thread>
+#include <vector>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::observability::PrometheusMetrics;
 
@@ -73,10 +74,12 @@ TEST(PrometheusMetricsTest, ThreadSafeCounterUnderContention) {
     std::vector<std::thread> threads;
     for (int i = 0; i < 8; ++i) {
         threads.emplace_back([&] {
-            for (int j = 0; j < 100; ++j) m.increment("concurrent");
+            for (int j = 0; j < 100; ++j)
+                m.increment("concurrent");
         });
     }
-    for (auto& t : threads) t.join();
+    for (auto& t : threads)
+        t.join();
 
     auto out = m.render();
     EXPECT_NE(out.find("concurrent 800"), std::string::npos);

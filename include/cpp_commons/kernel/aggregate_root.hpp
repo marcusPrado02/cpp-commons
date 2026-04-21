@@ -3,6 +3,7 @@
 #pragma once
 #include "domain_event.hpp"
 #include "entity.hpp"
+
 #include <memory>
 #include <utility>
 #include <vector>
@@ -13,12 +14,10 @@ namespace cpp_commons::kernel {
 ///
 /// Call `record()` in command methods to enqueue events; call `pull_events()`
 /// in the application layer (after persistence) to dispatch them.
-template<EntityIdentifier TId>
+template <EntityIdentifier TId>
 class AggregateRoot : public Entity<TId> {
 public:
-    [[nodiscard]] bool has_pending_events() const noexcept {
-        return !pending_events_.empty();
-    }
+    [[nodiscard]] bool has_pending_events() const noexcept { return !pending_events_.empty(); }
 
     [[nodiscard]] std::vector<std::unique_ptr<DomainEvent>> pull_events() {
         return std::exchange(pending_events_, {});
@@ -27,11 +26,9 @@ public:
 protected:
     using Entity<TId>::Entity;
 
-    void record(std::unique_ptr<DomainEvent> event) {
-        pending_events_.push_back(std::move(event));
-    }
+    void record(std::unique_ptr<DomainEvent> event) { pending_events_.push_back(std::move(event)); }
 
-    template<typename E, typename... Args>
+    template <typename E, typename... Args>
     void record(Args&&... args) {
         pending_events_.push_back(std::make_unique<E>(std::forward<Args>(args)...));
     }
@@ -40,4 +37,4 @@ private:
     std::vector<std::unique_ptr<DomainEvent>> pending_events_;
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

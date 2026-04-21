@@ -1,5 +1,6 @@
 #include <cpp_commons/kernel/email.hpp>
 #include <cpp_commons/kernel/phone_number.hpp>
+
 #include <gtest/gtest.h>
 
 using cpp_commons::kernel::Email;

@@ -18,10 +18,9 @@ class CommandBus {
 public:
     template <typename Cmd, typename Handler>
     void register_handler(Handler handler) {
-        handlers_[std::type_index(typeid(Cmd))] =
-            [h = std::move(handler)](const std::any& cmd) {
-                h(std::any_cast<const Cmd&>(cmd));
-            };
+        handlers_[std::type_index(typeid(Cmd))] = [h = std::move(handler)](const std::any& cmd) {
+            h(std::any_cast<const Cmd&>(cmd));
+        };
     }
 
     template <typename Cmd>
@@ -36,4 +35,4 @@ private:
     std::unordered_map<std::type_index, std::function<void(const std::any&)>> handlers_;
 };
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

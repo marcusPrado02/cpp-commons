@@ -24,8 +24,8 @@ public:
 
     struct Step {
         std::string name;
-        Action      action;
-        Action      compensation; // may be empty for non-compensatable steps
+        Action action;
+        Action compensation;  // may be empty for non-compensatable steps
     };
 
     SagaOrchestrator& step(std::string name, Action action, Action compensation = {}) {
@@ -54,11 +54,13 @@ private:
         for (std::size_t i = up_to; i > 0; --i) {
             auto& s = steps_[i - 1];
             if (s.compensation) {
-                try { s.compensation(); }
-                catch (...) {} // best-effort; log in production
+                try {
+                    s.compensation();
+                } catch (...) {
+                }  // best-effort; log in production
             }
         }
     }
 };
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

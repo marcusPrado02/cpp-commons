@@ -14,7 +14,7 @@ public:
 
     void set(kernel::TimePoint t) noexcept { now_ = t; }
 
-    template<typename Rep, typename Period>
+    template <typename Rep, typename Period>
     void advance(std::chrono::duration<Rep, Period> d) {
         now_ += std::chrono::duration_cast<kernel::Duration>(d);
     }
@@ -25,4 +25,4 @@ private:
 
 static_assert(kernel::Clock<FakeClock>);
 
-} // namespace cpp_commons::testing
+}  // namespace cpp_commons::testing

@@ -1,29 +1,33 @@
 #include <instrumented_use_case.hpp>
-#include <cpp_commons/testing/fake_metrics.hpp>
-#include <cpp_commons/kernel/result.hpp>
-#include <gtest/gtest.h>
 #include <string>
+
+#include <cpp_commons/kernel/result.hpp>
+#include <cpp_commons/testing/fake_metrics.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::application;
 using cpp_commons::kernel::Result;
 using Metrics = cpp_commons::testing::SpyMetrics;
 
-struct Input  { int value{}; };
-struct Output { int result{}; };
-struct MyErr  { std::string msg; };
+struct Input {
+    int value{};
+};
+struct Output {
+    int result{};
+};
+struct MyErr {
+    std::string msg;
+};
 
 using UC = UseCase<Input, Output, MyErr>;
 
 struct AlwaysOkUseCase : UC {
-    Result execute(const Input& in) override {
-        return Result::ok(Output{in.value * 2});
-    }
+    Result execute(const Input& in) override { return Result::ok(Output{in.value * 2}); }
 };
 
 struct AlwaysErrUseCase : UC {
-    Result execute(const Input&) override {
-        return Result::err(MyErr{"oops"});
-    }
+    Result execute(const Input&) override { return Result::err(MyErr{"oops"}); }
 };
 
 TEST(InstrumentedUseCaseTest, IncrementsCallCounterOnSuccess) {

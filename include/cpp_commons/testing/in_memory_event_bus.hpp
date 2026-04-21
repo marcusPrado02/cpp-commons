@@ -1,13 +1,14 @@
 /// @file in_memory_event_bus.hpp
 /// @brief InMemoryEventBus — thread-safe event store and dispatcher for unit tests.
 #pragma once
-#include <cpp_commons/kernel/domain_event.hpp>
 #include <functional>
 #include <memory>
 #include <mutex>
 #include <typeindex>
 #include <unordered_map>
 #include <vector>
+
+#include <cpp_commons/kernel/domain_event.hpp>
 
 namespace cpp_commons::testing {
 
@@ -67,8 +68,9 @@ public:
 private:
     using HandlerFn = std::function<void(const kernel::DomainEvent&)>;
     mutable std::mutex mutex_;
-    std::unordered_map<std::type_index, std::vector<std::unique_ptr<kernel::DomainEvent>>> published_;
+    std::unordered_map<std::type_index, std::vector<std::unique_ptr<kernel::DomainEvent>>>
+        published_;
     std::unordered_map<std::type_index, std::vector<HandlerFn>> handlers_;
 };
 
-} // namespace cpp_commons::testing
+}  // namespace cpp_commons::testing

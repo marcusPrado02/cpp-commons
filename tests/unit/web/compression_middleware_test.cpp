@@ -1,11 +1,12 @@
 #include <compression_middleware.hpp>
 #include <middleware_chain.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
 
 static HttpResponse dispatch_with_compression(const HttpRequest& req,
-                                               const std::string& body = "hello world") {
+                                              const std::string& body = "hello world") {
     MiddlewareChain chain;
     chain.use(compression_middleware());
     Handler final_handler = [body](const HttpRequest&) {
@@ -57,4 +58,4 @@ TEST(CompressionMiddlewareTest, ContentLengthUpdatedAfterCompression) {
     EXPECT_EQ(reported, resp.body.size());
 }
 
-#endif // CPP_COMMONS_HAS_ZLIB
+#endif  // CPP_COMMONS_HAS_ZLIB

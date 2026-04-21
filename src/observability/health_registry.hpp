@@ -32,4 +32,4 @@ private:
     std::unordered_map<std::string, CheckFn> checks_;
 };
 
-} // namespace cpp_commons::observability
+}  // namespace cpp_commons::observability

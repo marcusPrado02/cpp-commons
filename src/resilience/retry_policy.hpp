@@ -1,5 +1,4 @@
 #pragma once
-#include <cpp_commons/kernel/deadline.hpp>
 #include <chrono>
 #include <cstdint>
 #include <exception>
@@ -9,6 +8,8 @@
 #include <stdexcept>
 #include <thread>
 
+#include <cpp_commons/kernel/deadline.hpp>
+
 namespace cpp_commons::resilience {
 
 struct RetryExhausted : std::runtime_error {
@@ -16,9 +17,9 @@ struct RetryExhausted : std::runtime_error {
 };
 
 enum class JitterStrategy {
-    None,     // deterministic exponential backoff
-    Full,     // uniform in [0, computed_delay]
-    Equal,    // computed_delay/2 + uniform in [0, computed_delay/2]
+    None,   // deterministic exponential backoff
+    Full,   // uniform in [0, computed_delay]
+    Equal,  // computed_delay/2 + uniform in [0, computed_delay/2]
 };
 
 struct RetryConfig {
@@ -52,7 +53,8 @@ namespace detail {
 
 inline std::chrono::milliseconds apply_jitter(std::chrono::milliseconds base,
                                               JitterStrategy strategy) {
-    if (strategy == JitterStrategy::None || base.count() == 0) return base;
+    if (strategy == JitterStrategy::None || base.count() == 0)
+        return base;
     thread_local std::mt19937_64 rng{std::random_device{}()};
     auto ms = base.count();
     if (strategy == JitterStrategy::Full) {
@@ -64,7 +66,7 @@ inline std::chrono::milliseconds apply_jitter(std::chrono::milliseconds base,
     return std::chrono::milliseconds{ms / 2 + dist(rng)};
 }
 
-} // namespace detail
+}  // namespace detail
 
 // Executes fn, retrying on exception up to config.max_attempts times
 // with exponential backoff. Throws RetryExhausted if all attempts fail.
@@ -87,10 +89,11 @@ auto with_retry(const RetryConfig& cfg, Fn&& fn) -> decltype(fn()) {
                 std::rethrow_exception(ep);
             if (attempt + 1 < cfg.max_attempts) {
                 if (cfg.deadline && cfg.deadline->is_expired())
-                    throw DeadlineExceeded{"deadline exceeded after attempt " + std::to_string(attempt)};
+                    throw DeadlineExceeded{"deadline exceeded after attempt " +
+                                           std::to_string(attempt)};
                 std::this_thread::sleep_for(detail::apply_jitter(delay, cfg.jitter));
-                auto next = std::chrono::milliseconds(
-                    static_cast<long long>(static_cast<double>(delay.count()) * cfg.backoff_multiplier));
+                auto next = std::chrono::milliseconds(static_cast<long long>(
+                    static_cast<double>(delay.count()) * cfg.backoff_multiplier));
                 delay = next < cfg.max_delay ? next : cfg.max_delay;
             }
         }
@@ -98,4 +101,4 @@ auto with_retry(const RetryConfig& cfg, Fn&& fn) -> decltype(fn()) {
     throw RetryExhausted{"all retry attempts exhausted"};
 }
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

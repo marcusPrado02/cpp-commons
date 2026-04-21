@@ -7,13 +7,13 @@ namespace cpp_commons::application {
 // Concrete classes implement execute() and inject dependencies in the ctor.
 template <typename In, typename Out, typename Err>
 struct UseCase {
-    using Input  = In;
+    using Input = In;
     using Output = Out;
-    using Error  = Err;
+    using Error = Err;
     using Result = kernel::Result<Out, Err>;
 
     virtual ~UseCase() = default;
     [[nodiscard]] virtual Result execute(const In& input) = 0;
 };
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

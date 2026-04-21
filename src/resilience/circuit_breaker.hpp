@@ -55,4 +55,4 @@ private:
     std::chrono::steady_clock::time_point opened_at_{};
 };
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

@@ -1,25 +1,26 @@
 #pragma once
-#include <cpp_commons/kernel/identity.hpp>
 #include <optional>
 #include <string>
 #include <string_view>
+
+#include <cpp_commons/kernel/identity.hpp>
 
 namespace cpp_commons::observability {
 
 struct CorrelationContext {
     std::string correlation_id{};
     std::string tenant_id{};
-    std::string trace_id{};    // 32-char hex (W3C trace-id)
-    std::string span_id{};     // 16-char hex (W3C parent-id)
+    std::string trace_id{};  // 32-char hex (W3C trace-id)
+    std::string span_id{};   // 16-char hex (W3C parent-id)
     std::string request_id{};
     std::string tracestate{};  // W3C tracestate header value (opaque)
 
     [[nodiscard]] static CorrelationContext generate() {
         CorrelationContext ctx;
         ctx.correlation_id = kernel::UUID::generate().to_string();
-        ctx.trace_id       = kernel::UUID::generate().to_string_no_dashes();
-        ctx.span_id        = ctx.trace_id.substr(0, 16);
-        ctx.request_id     = kernel::UUID::generate().to_string();
+        ctx.trace_id = kernel::UUID::generate().to_string_no_dashes();
+        ctx.span_id = ctx.trace_id.substr(0, 16);
+        ctx.request_id = kernel::UUID::generate().to_string();
         return ctx;
     }
 
@@ -51,4 +52,4 @@ private:
     CorrelationContext previous_;
 };
 
-} // namespace cpp_commons::observability
+}  // namespace cpp_commons::observability

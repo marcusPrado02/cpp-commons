@@ -1,5 +1,6 @@
-#include <settings.hpp>
 #include <env_source.hpp>
+#include <settings.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::config;
@@ -148,21 +149,17 @@ TEST(ConfigValidatorTest, RequireDurationAggregatesOnBadSuffix) {
 TEST(RequireValidatedTest, PassesWhenPredicateTrue) {
     ::setenv("CPP_COMMONS_TEST_PORT", "8080", 1);
     auto v = require_validated<int>(
-        "CPP_COMMONS_TEST_PORT",
-        [](int p) { return p > 0 && p < 65536; },
-        "port must be 1-65535");
+        "CPP_COMMONS_TEST_PORT", [](int p) { return p > 0 && p < 65536; }, "port must be 1-65535");
     EXPECT_EQ(v, 8080);
     ::unsetenv("CPP_COMMONS_TEST_PORT");
 }
 
 TEST(RequireValidatedTest, ThrowsWhenPredicateFalse) {
     ::setenv("CPP_COMMONS_TEST_PORT", "0", 1);
-    EXPECT_THROW(
-        require_validated<int>(
-            "CPP_COMMONS_TEST_PORT",
-            [](int p) { return p > 0 && p < 65536; },
-            "port must be 1-65535"),
-        ConfigError);
+    EXPECT_THROW(require_validated<int>(
+                     "CPP_COMMONS_TEST_PORT", [](int p) { return p > 0 && p < 65536; },
+                     "port must be 1-65535"),
+                 ConfigError);
     ::unsetenv("CPP_COMMONS_TEST_PORT");
 }
 
@@ -182,11 +179,8 @@ TEST(RequireValidatedTest, ErrorMessageContainsConstraint) {
 
 TEST(RequireValidatedTest, ThrowsWhenVarMissing) {
     ::unsetenv("CPP_COMMONS_TEST_MISSING");
-    EXPECT_THROW(
-        require_validated<int>(
-            "CPP_COMMONS_TEST_MISSING",
-            [](int) { return true; }),
-        ConfigError);
+    EXPECT_THROW(require_validated<int>("CPP_COMMONS_TEST_MISSING", [](int) { return true; }),
+                 ConfigError);
 }
 
 // ── EnvSource prefix ─────────────────────────────────────────────────────────

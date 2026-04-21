@@ -1,7 +1,8 @@
-#include <dotenv_source.hpp>
-#include <gtest/gtest.h>
-#include <fstream>
 #include <cstdio>
+#include <dotenv_source.hpp>
+#include <fstream>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::config::DotenvSource;
 

@@ -10,7 +10,7 @@ namespace cpp_commons::kernel {
 /// @brief Abstract predicate over a domain object `T`.
 ///
 /// Implement `is_satisfied_by()` in a concrete subclass, then compose via `Spec<T>`.
-template<typename T>
+template <typename T>
 class Specification {
 public:
     virtual ~Specification() = default;
@@ -20,7 +20,7 @@ public:
     [[nodiscard]] virtual std::string to_string() const { return typeid(*this).name(); }
 };
 
-template<typename T>
+template <typename T>
 class AndSpecification final : public Specification<T> {
 public:
     AndSpecification(std::shared_ptr<Specification<T>> l, std::shared_ptr<Specification<T>> r)
@@ -32,11 +32,12 @@ public:
     [[nodiscard]] std::string to_string() const override {
         return "(" + left_->to_string() + " && " + right_->to_string() + ")";
     }
+
 private:
     std::shared_ptr<Specification<T>> left_, right_;
 };
 
-template<typename T>
+template <typename T>
 class OrSpecification final : public Specification<T> {
 public:
     OrSpecification(std::shared_ptr<Specification<T>> l, std::shared_ptr<Specification<T>> r)
@@ -48,11 +49,12 @@ public:
     [[nodiscard]] std::string to_string() const override {
         return "(" + left_->to_string() + " || " + right_->to_string() + ")";
     }
+
 private:
     std::shared_ptr<Specification<T>> left_, right_;
 };
 
-template<typename T>
+template <typename T>
 class NotSpecification final : public Specification<T> {
 public:
     explicit NotSpecification(std::shared_ptr<Specification<T>> s) : spec_{std::move(s)} {}
@@ -60,15 +62,14 @@ public:
     [[nodiscard]] bool is_satisfied_by(const T& c) const override {
         return !spec_->is_satisfied_by(c);
     }
-    [[nodiscard]] std::string to_string() const override {
-        return "(!" + spec_->to_string() + ")";
-    }
+    [[nodiscard]] std::string to_string() const override { return "(!" + spec_->to_string() + ")"; }
+
 private:
     std::shared_ptr<Specification<T>> spec_;
 };
 
 /// @brief Composable wrapper over `Specification<T>` — supports `&&`, `||`, `!` operators.
-template<typename T>
+template <typename T>
 class Spec {
 public:
     explicit Spec(std::shared_ptr<Specification<T>> impl) : impl_{std::move(impl)} {}
@@ -90,4 +91,4 @@ private:
     std::shared_ptr<Specification<T>> impl_;
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

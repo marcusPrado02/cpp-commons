@@ -13,16 +13,15 @@ namespace cpp_commons::resilience {
 // Both calls receive a shared cancelled flag they may poll to abort early.
 // If both calls throw, the first exception is rethrown.
 template <typename Fn>
-auto hedge(std::chrono::milliseconds hedge_delay, Fn fn)
-    -> std::invoke_result_t<Fn, std::atomic<bool>&>
-{
+auto hedge(std::chrono::milliseconds hedge_delay,
+           Fn fn) -> std::invoke_result_t<Fn, std::atomic<bool>&> {
     using Result = std::invoke_result_t<Fn, std::atomic<bool>&>;
 
     struct Shared {
-        std::atomic<bool>        cancelled{false};
-        std::atomic<int>         failures{0};
-        std::promise<Result>     promise;
-        std::exception_ptr       first_ex;
+        std::atomic<bool> cancelled{false};
+        std::atomic<int> failures{0};
+        std::promise<Result> promise;
+        std::exception_ptr first_ex;
     };
     auto sh = std::make_shared<Shared>();
     auto fut = sh->promise.get_future();
@@ -37,8 +36,10 @@ auto hedge(std::chrono::milliseconds hedge_delay, Fn fn)
                 sh->first_ex = std::current_exception();
             // If both failed, second thread sets the exception.
             if (sh->failures.load() >= 2) {
-                try { sh->promise.set_exception(sh->first_ex); }
-                catch (const std::future_error&) {}
+                try {
+                    sh->promise.set_exception(sh->first_ex);
+                } catch (const std::future_error&) {
+                }
             }
         }
     };
@@ -49,17 +50,20 @@ auto hedge(std::chrono::milliseconds hedge_delay, Fn fn)
     // Hedge starts after delay, skipped if primary already done.
     std::thread([run, fn, hedge_delay, sh]() mutable {
         std::this_thread::sleep_for(hedge_delay);
-        if (!sh->cancelled.load()) run(fn);
+        if (!sh->cancelled.load())
+            run(fn);
         // If hedge skipped after primary succeeded, failures stays < 2
         // and the promise was already fulfilled — nothing to do.
         // But if primary failed and hedge was skipped, we must set exception.
         else if (sh->failures.load() == 1) {
-            try { sh->promise.set_exception(sh->first_ex); }
-            catch (const std::future_error&) {}
+            try {
+                sh->promise.set_exception(sh->first_ex);
+            } catch (const std::future_error&) {
+            }
         }
     }).detach();
 
     return fut.get();
 }
 
-} // namespace cpp_commons::resilience
+}  // namespace cpp_commons::resilience

@@ -1,9 +1,11 @@
+#include <chrono>
+
 #include <cpp_commons/testing/builders.hpp>
 #include <cpp_commons/testing/fake_clock.hpp>
 #include <cpp_commons/testing/fake_logger.hpp>
 #include <cpp_commons/testing/fake_metrics.hpp>
+
 #include <gtest/gtest.h>
-#include <chrono>
 
 using namespace std::chrono_literals;
 using namespace cpp_commons::testing;
@@ -69,13 +71,16 @@ TEST(SpyMetricsTest, TrackGauge) {
 }
 
 // Builder tests
-struct Config { int port{8080}; std::string host{"localhost"}; };
+struct Config {
+    int port{8080};
+    std::string host{"localhost"};
+};
 
 TEST(BuilderTest, AppliesSteps) {
     auto cfg = Builder<Config>{}
-        .with([](Config& c){ c.port = 9090; })
-        .with([](Config& c){ c.host = "example.com"; })
-        .build();
+                   .with([](Config& c) { c.port = 9090; })
+                   .with([](Config& c) { c.host = "example.com"; })
+                   .build();
     EXPECT_EQ(cfg.port, 9090);
     EXPECT_EQ(cfg.host, "example.com");
 }

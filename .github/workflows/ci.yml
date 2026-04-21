@@ -136,7 +136,8 @@ jobs:
         run: |
           lcov --capture --directory build/coverage \
                --output-file coverage.info \
-               --gcov-tool gcov-13
+               --gcov-tool gcov-13 \
+               --ignore-errors mismatch
           lcov --remove coverage.info \
                '*/build/_deps/*' '/usr/*' \
                --output-file coverage.filtered.info

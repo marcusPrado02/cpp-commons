@@ -1,6 +1,8 @@
-#include <cpp_commons/security/secure_random.hpp>
-#include <gtest/gtest.h>
 #include <set>
+
+#include <cpp_commons/security/secure_random.hpp>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::security::SecureRandom;
 
@@ -19,8 +21,8 @@ TEST(SecureRandomTest, TokenIsUrlSafeBase64) {
     auto token = SecureRandom::generate_token(32);
     EXPECT_FALSE(token.empty());
     for (char c : token) {
-        bool safe = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-                    (c >= '0' && c <= '9') || c == '-' || c == '_';
+        bool safe = (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9') ||
+                    c == '-' || c == '_';
         EXPECT_TRUE(safe) << "Non-URL-safe character: " << c;
     }
 }

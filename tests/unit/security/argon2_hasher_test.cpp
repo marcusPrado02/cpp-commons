@@ -1,4 +1,5 @@
 #include <argon2_hasher.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::security;
@@ -31,7 +32,7 @@ TEST(Argon2HasherTest, TwoHashesDiffer) {
     auto h = fast_hasher();
     auto e1 = h.hash("password");
     auto e2 = h.hash("password");
-    EXPECT_NE(e1, e2); // different salt each time
+    EXPECT_NE(e1, e2);  // different salt each time
 }
 
 TEST(Argon2HasherTest, EmptyPasswordHashAndVerify) {

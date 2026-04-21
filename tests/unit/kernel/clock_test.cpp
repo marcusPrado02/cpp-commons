@@ -1,6 +1,8 @@
-#include <cpp_commons/kernel/clock.hpp>
-#include <gtest/gtest.h>
 #include <chrono>
+
+#include <cpp_commons/kernel/clock.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::kernel;
 using namespace std::chrono_literals;

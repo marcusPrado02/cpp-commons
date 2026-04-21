@@ -1,7 +1,8 @@
 #include <content_negotiation.hpp>
-#include <gtest/gtest.h>
 #include <string>
 #include <vector>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
 
@@ -30,9 +31,8 @@ TEST(ContentNegotiationTest, NoMatchReturnsEmpty) {
 TEST(ContentNegotiationTest, QualityFactorOrdering) {
     // Prefer text/html (q=0.9) over application/json (q=1.0) from the client's perspective,
     // but application/json has q=1.0 so it wins.
-    auto t = negotiate_content_type(
-        "text/html;q=0.9,application/json;q=1.0",
-        {"text/html", "application/json"});
+    auto t = negotiate_content_type("text/html;q=0.9,application/json;q=1.0",
+                                    {"text/html", "application/json"});
     EXPECT_EQ(t, "application/json");
 }
 
@@ -50,9 +50,8 @@ TEST(ContentNegotiationMiddlewareTest, SetsContentTypeOnMatch) {
     HttpRequest req;
     req.headers["Accept"] = "application/json";
 
-    auto resp = chain.dispatch(req, [](const HttpRequest&) {
-        return HttpResponse::ok(R"({"ok":true})");
-    });
+    auto resp =
+        chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok(R"({"ok":true})"); });
 
     EXPECT_EQ(resp.status_code, 200);
     EXPECT_EQ(resp.headers.at("Content-Type"), "application/json");
@@ -65,9 +64,7 @@ TEST(ContentNegotiationMiddlewareTest, Returns406OnNoMatch) {
     HttpRequest req;
     req.headers["Accept"] = "text/xml";
 
-    auto resp = chain.dispatch(req, [](const HttpRequest&) {
-        return HttpResponse::ok("never");
-    });
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("never"); });
 
     EXPECT_EQ(resp.status_code, 406);
 }
@@ -78,9 +75,7 @@ TEST(ContentNegotiationMiddlewareTest, NoAcceptHeaderPassesThrough) {
 
     HttpRequest req;  // no Accept header
 
-    auto resp = chain.dispatch(req, [](const HttpRequest&) {
-        return HttpResponse::ok("ok");
-    });
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("ok"); });
 
     EXPECT_EQ(resp.status_code, 200);
 }

@@ -3,11 +3,13 @@
 ///
 /// Usage: `EXPECT_THAT(result, IsOk())`, `EXPECT_THAT(opt, IsSomeWith(42))`.
 #pragma once
-#include <cpp_commons/kernel/result.hpp>
-#include <cpp_commons/kernel/option.hpp>
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
 #include <string>
+
+#include <cpp_commons/kernel/option.hpp>
+#include <cpp_commons/kernel/result.hpp>
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 namespace cpp_commons::testing {
 
@@ -83,4 +85,4 @@ MATCHER_P(IsSomeWith, expected, "is a non-empty Option with the expected value")
     return true;
 }
 
-} // namespace cpp_commons::testing
+}  // namespace cpp_commons::testing

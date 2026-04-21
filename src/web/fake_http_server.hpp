@@ -1,7 +1,8 @@
 #pragma once
-#include "middleware_chain.hpp"
 #include "http_request.hpp"
 #include "http_response.hpp"
+#include "middleware_chain.hpp"
+
 #include <string>
 #include <unordered_map>
 
@@ -30,19 +31,18 @@ public:
 
     [[nodiscard]] HttpResponse get(std::string path, Headers hdrs = {}) const {
         HttpRequest req;
-        req.method  = HttpMethod::Get;
-        req.path    = std::move(path);
+        req.method = HttpMethod::Get;
+        req.path = std::move(path);
         req.headers = std::move(hdrs);
         return dispatch(req);
     }
 
-    [[nodiscard]] HttpResponse post(std::string path, std::string body,
-                                    Headers hdrs = {}) const {
+    [[nodiscard]] HttpResponse post(std::string path, std::string body, Headers hdrs = {}) const {
         HttpRequest req;
-        req.method  = HttpMethod::Post;
-        req.path    = std::move(path);
+        req.method = HttpMethod::Post;
+        req.path = std::move(path);
         req.headers = std::move(hdrs);
-        req.body    = std::move(body);
+        req.body = std::move(body);
         return dispatch(req);
     }
 
@@ -55,4 +55,4 @@ private:
     }
 };
 
-} // namespace cpp_commons::web
+}  // namespace cpp_commons::web

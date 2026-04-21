@@ -1,10 +1,10 @@
-#include <hedge.hpp>
-#include <gtest/gtest.h>
-
 #include <atomic>
 #include <chrono>
+#include <hedge.hpp>
 #include <stdexcept>
 #include <thread>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::resilience;
 using namespace std::chrono_literals;
@@ -39,11 +39,9 @@ TEST(HedgeTest, HedgeFiresWhenPrimaryIsSlow) {
 }
 
 TEST(HedgeTest, BothFailsRethrowsFirstException) {
-    EXPECT_THROW({
-        hedge(20ms, [](std::atomic<bool>&) -> int {
-            throw std::runtime_error{"fail"};
-        });
-    }, std::runtime_error);
+    EXPECT_THROW(
+        { hedge(20ms, [](std::atomic<bool>&) -> int { throw std::runtime_error{"fail"}; }); },
+        std::runtime_error);
 }
 
 TEST(HedgeTest, CancelledFlagSetAfterFirstCompletes) {
@@ -51,7 +49,8 @@ TEST(HedgeTest, CancelledFlagSetAfterFirstCompletes) {
     hedge(30ms, [&](std::atomic<bool>& c) -> int {
         static std::atomic<int> idx{0};
         int id = idx.fetch_add(1);
-        if (id == 0) return 99;
+        if (id == 0)
+            return 99;
         // Second call should see cancelled = true
         hedge_saw_cancel.store(c.load());
         return 88;

@@ -1,11 +1,11 @@
-#include <config_watcher.hpp>
-#include <gtest/gtest.h>
-
 #include <atomic>
 #include <chrono>
+#include <config_watcher.hpp>
 #include <fstream>
 #include <thread>
 #include <unistd.h>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::config;
 using namespace std::chrono_literals;
@@ -26,7 +26,7 @@ TEST(ConfigWatcherTest, StartsAndStops) {
     const auto path = tmp_file();
     write_file(path);
 
-    ConfigWatcher w{path, []{}};
+    ConfigWatcher w{path, [] {}};
     w.start();
     EXPECT_TRUE(w.is_running());
     w.stop();
@@ -38,7 +38,7 @@ TEST(ConfigWatcherTest, CallsCallbackOnFileChange) {
     write_file(path);
 
     std::atomic<int> calls{0};
-    ConfigWatcher w{path, [&calls]{ calls.fetch_add(1); }};
+    ConfigWatcher w{path, [&calls] { calls.fetch_add(1); }};
     w.start();
 
     std::this_thread::sleep_for(50ms);
@@ -54,7 +54,7 @@ TEST(ConfigWatcherTest, NotCalledWhenFileNotChanged) {
     write_file(path);
 
     std::atomic<int> calls{0};
-    ConfigWatcher w{path, [&calls]{ calls.fetch_add(1); }};
+    ConfigWatcher w{path, [&calls] { calls.fetch_add(1); }};
     w.start();
     std::this_thread::sleep_for(200ms);
     w.stop();
@@ -65,20 +65,20 @@ TEST(ConfigWatcherTest, DestructorStopsThread) {
     const auto path = tmp_file();
     write_file(path);
     {
-        ConfigWatcher w{path, []{}};
+        ConfigWatcher w{path, [] {}};
         w.start();
         EXPECT_TRUE(w.is_running());
-    } // destructor called here
+    }  // destructor called here
     // no crash = pass
 }
 
-#else // __linux__
+#else  // __linux__
 
 TEST(ConfigWatcherTest, NonLinuxIsNoOp) {
-    ConfigWatcher w{"/tmp/irrelevant", []{}};
+    ConfigWatcher w{"/tmp/irrelevant", [] {}};
     w.start();
-    EXPECT_FALSE(w.is_running()); // no-op on non-Linux
+    EXPECT_FALSE(w.is_running());  // no-op on non-Linux
     w.stop();
 }
 
-#endif // __linux__
+#endif  // __linux__

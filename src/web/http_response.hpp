@@ -1,8 +1,9 @@
 #pragma once
-#include <cpp_commons/errors/domain_error.hpp>
-#include <cpp_commons/errors/problem_details.hpp>
 #include <string>
 #include <unordered_map>
+
+#include <cpp_commons/errors/domain_error.hpp>
+#include <cpp_commons/errors/problem_details.hpp>
 
 namespace cpp_commons::web {
 
@@ -12,17 +13,13 @@ struct HttpResponse {
     std::string body;
     std::string content_type{"application/json"};
 
-    [[nodiscard]] static HttpResponse ok(std::string body) {
-        return {200, {}, std::move(body)};
-    }
+    [[nodiscard]] static HttpResponse ok(std::string body) { return {200, {}, std::move(body)}; }
 
     [[nodiscard]] static HttpResponse created(std::string body) {
         return {201, {}, std::move(body)};
     }
 
-    [[nodiscard]] static HttpResponse no_content() {
-        return {204, {}, ""};
-    }
+    [[nodiscard]] static HttpResponse no_content() { return {204, {}, ""}; }
 
     [[nodiscard]] static HttpResponse from_problem(const errors::ProblemDetails& pd) {
         return {pd.status, {{"Content-Type", "application/problem+json"}}, pd.to_json().dump()};
@@ -58,18 +55,18 @@ struct HttpResponse {
         if (dynamic_cast<const UnauthorizedError*>(&e))
             return unauthorized();
         if (dynamic_cast<const ForbiddenError*>(&e))
-            return from_problem({std::string{error_type::forbidden}, "Forbidden",
-                                 403, e.what(), ""});
+            return from_problem(
+                {std::string{error_type::forbidden}, "Forbidden", 403, e.what(), ""});
         if (dynamic_cast<const ConflictError*>(&e))
             return conflict(e.what());
         if (dynamic_cast<const RateLimitError*>(&e))
-            return from_problem({std::string{error_type::rate_limited}, "Too Many Requests",
-                                 429, e.what(), ""});
+            return from_problem(
+                {std::string{error_type::rate_limited}, "Too Many Requests", 429, e.what(), ""});
         if (dynamic_cast<const TimeoutError*>(&e))
-            return from_problem({std::string{error_type::timeout}, "Gateway Timeout",
-                                 504, e.what(), ""});
+            return from_problem(
+                {std::string{error_type::timeout}, "Gateway Timeout", 504, e.what(), ""});
         return internal_error();
     }
 };
 
-} // namespace cpp_commons::web
+}  // namespace cpp_commons::web

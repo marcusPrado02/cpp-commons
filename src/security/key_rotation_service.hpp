@@ -1,5 +1,6 @@
 #pragma once
 #include "aes_gcm_provider.hpp"
+
 #include <cstdint>
 #include <map>
 #include <stdexcept>
@@ -38,8 +39,8 @@ public:
         output.resize(4 + ciphertext.size());
         output[0] = static_cast<uint8_t>((version >> 24) & 0xFFu);
         output[1] = static_cast<uint8_t>((version >> 16) & 0xFFu);
-        output[2] = static_cast<uint8_t>((version >>  8) & 0xFFu);
-        output[3] = static_cast<uint8_t>( version        & 0xFFu);
+        output[2] = static_cast<uint8_t>((version >> 8) & 0xFFu);
+        output[3] = static_cast<uint8_t>(version & 0xFFu);
         std::copy(ciphertext.begin(), ciphertext.end(), output.begin() + 4);
         return output;
     }
@@ -50,10 +51,8 @@ public:
             throw KeyRotationError{"ciphertext too short"};
 
         const uint32_t version =
-            (static_cast<uint32_t>(data[0]) << 24) |
-            (static_cast<uint32_t>(data[1]) << 16) |
-            (static_cast<uint32_t>(data[2]) <<  8) |
-             static_cast<uint32_t>(data[3]);
+            (static_cast<uint32_t>(data[0]) << 24) | (static_cast<uint32_t>(data[1]) << 16) |
+            (static_cast<uint32_t>(data[2]) << 8) | static_cast<uint32_t>(data[3]);
 
         auto it = keys_.find(version);
         if (it == keys_.end())
@@ -64,16 +63,15 @@ public:
     }
 
     [[nodiscard]] uint32_t current_version() const {
-        if (keys_.empty()) throw KeyRotationError{"no keys registered"};
+        if (keys_.empty())
+            throw KeyRotationError{"no keys registered"};
         return keys_.rbegin()->first;
     }
 
-    [[nodiscard]] bool has_version(uint32_t v) const {
-        return keys_.count(v) > 0;
-    }
+    [[nodiscard]] bool has_version(uint32_t v) const { return keys_.count(v) > 0; }
 
 private:
     std::map<uint32_t, AesGcmProvider> keys_;
 };
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

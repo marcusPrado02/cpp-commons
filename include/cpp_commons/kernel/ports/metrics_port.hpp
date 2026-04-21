@@ -7,11 +7,11 @@
 namespace cpp_commons::kernel {
 
 /// @brief Any type exposing `increment`, `gauge`, and `histogram` satisfies this port.
-template<typename T>
+template <typename T>
 concept MetricsPort = requires(T t, std::string_view name, double value) {
-    { t.increment(name)        } -> std::same_as<void>;
-    { t.gauge(name, value)     } -> std::same_as<void>;
+    { t.increment(name) } -> std::same_as<void>;
+    { t.gauge(name, value) } -> std::same_as<void>;
     { t.histogram(name, value) } -> std::same_as<void>;
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

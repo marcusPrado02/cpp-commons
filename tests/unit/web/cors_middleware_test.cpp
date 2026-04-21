@@ -1,4 +1,5 @@
 #include <cors_middleware.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
@@ -11,7 +12,7 @@ TEST(CorsMiddlewareTest, WildcardOriginSetOnSimpleRequest) {
     auto mw = cors_middleware();
     HttpRequest req;
     req.method = HttpMethod::Get;
-    req.path   = "/api";
+    req.path = "/api";
     req.headers["Origin"] = "https://example.com";
 
     auto resp = mw(req, echo_ok);
@@ -25,7 +26,7 @@ TEST(CorsMiddlewareTest, AllowsListedOrigin) {
 
     HttpRequest req;
     req.method = HttpMethod::Get;
-    req.path   = "/";
+    req.path = "/";
     req.headers["Origin"] = "https://app.example.com";
 
     auto resp = mw(req, echo_ok);
@@ -39,7 +40,7 @@ TEST(CorsMiddlewareTest, BlocksUnlistedOrigin) {
 
     HttpRequest req;
     req.method = HttpMethod::Get;
-    req.path   = "/";
+    req.path = "/";
     req.headers["Origin"] = "https://evil.example.com";
 
     auto resp = mw(req, echo_ok);
@@ -51,7 +52,7 @@ TEST(CorsMiddlewareTest, PreflightReturns204WithHeaders) {
 
     HttpRequest req;
     req.method = HttpMethod::Options;
-    req.path   = "/api";
+    req.path = "/api";
     req.headers["Origin"] = "https://example.com";
 
     auto resp = mw(req, echo_ok);
@@ -67,7 +68,7 @@ TEST(CorsMiddlewareTest, CredentialsHeaderSetWhenEnabled) {
 
     HttpRequest req;
     req.method = HttpMethod::Get;
-    req.path   = "/";
+    req.path = "/";
     req.headers["Origin"] = "https://example.com";
 
     auto resp = mw(req, echo_ok);

@@ -1,6 +1,8 @@
-#include <cpp_commons/kernel/option.hpp>
-#include <gtest/gtest.h>
 #include <string>
+
+#include <cpp_commons/kernel/option.hpp>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::kernel::Option;
 
@@ -18,8 +20,8 @@ TEST(OptionTest, NoneHasNoValue) {
 }
 
 TEST(OptionTest, ValueOrReturnsDefault) {
-    EXPECT_EQ(Option<int>::none().value_or(99),  99);
-    EXPECT_EQ(Option<int>::some(1).value_or(99),  1);
+    EXPECT_EQ(Option<int>::none().value_or(99), 99);
+    EXPECT_EQ(Option<int>::some(1).value_or(99), 1);
 }
 
 TEST(OptionTest, BoolConversion) {
@@ -37,7 +39,10 @@ TEST(OptionMapTest, TransformsValueOnSome) {
 
 TEST(OptionMapTest, ReturnsNoneOnNone) {
     bool called = false;
-    auto o = Option<int>::none().map([&](int v) { called = true; return v; });
+    auto o = Option<int>::none().map([&](int v) {
+        called = true;
+        return v;
+    });
     EXPECT_FALSE(called);
     EXPECT_FALSE(o.has_value());
 }
@@ -64,7 +69,10 @@ TEST(OptionFilterTest, NoneStaysNone) {
 
 TEST(OptionValueOrElseTest, ReturnsValueOnSome) {
     int calls = 0;
-    int v = Option<int>::some(42).value_or_else([&] { ++calls; return 0; });
+    int v = Option<int>::some(42).value_or_else([&] {
+        ++calls;
+        return 0;
+    });
     EXPECT_EQ(v, 42);
     EXPECT_EQ(calls, 0);  // factory not called
 }

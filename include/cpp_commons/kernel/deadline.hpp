@@ -2,6 +2,7 @@
 /// @brief Deadline — absolute time point by which an operation must complete.
 #pragma once
 #include "clock.hpp"
+
 #include <chrono>
 
 namespace cpp_commons::kernel {
@@ -20,9 +21,7 @@ public:
     }
 
     // No deadline — operations always proceed.
-    static Deadline never() {
-        return Deadline{TimePoint::max()};
-    }
+    static Deadline never() { return Deadline{TimePoint::max()}; }
 
     [[nodiscard]] bool is_expired() const noexcept {
         return std::chrono::system_clock::now() >= at_;
@@ -30,7 +29,8 @@ public:
 
     [[nodiscard]] std::chrono::milliseconds remaining() const noexcept {
         auto now = std::chrono::system_clock::now();
-        if (now >= at_) return std::chrono::milliseconds{0};
+        if (now >= at_)
+            return std::chrono::milliseconds{0};
         return std::chrono::duration_cast<std::chrono::milliseconds>(at_ - now);
     }
 
@@ -40,4 +40,4 @@ private:
     TimePoint at_;
 };
 
-} // namespace cpp_commons::kernel
+}  // namespace cpp_commons::kernel

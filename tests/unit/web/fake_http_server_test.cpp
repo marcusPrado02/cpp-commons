@@ -1,6 +1,7 @@
+#include <content_negotiation.hpp>
 #include <fake_http_server.hpp>
 #include <rate_limit_middleware.hpp>
-#include <content_negotiation.hpp>
+
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
@@ -13,9 +14,8 @@ TEST(FakeHttpServerTest, Returns404ForUnregisteredRoute) {
 
 TEST(FakeHttpServerTest, DispatchesRegisteredGetRoute) {
     FakeHttpServer server;
-    server.route(HttpMethod::Get, "/hello", [](const HttpRequest&) {
-        return HttpResponse::ok(R"({"msg":"hello"})");
-    });
+    server.route(HttpMethod::Get, "/hello",
+                 [](const HttpRequest&) { return HttpResponse::ok(R"({"msg":"hello"})"); });
 
     auto resp = server.get("/hello");
     EXPECT_EQ(resp.status_code, 200);
@@ -24,9 +24,8 @@ TEST(FakeHttpServerTest, DispatchesRegisteredGetRoute) {
 
 TEST(FakeHttpServerTest, DispatchesRegisteredPostRoute) {
     FakeHttpServer server;
-    server.route(HttpMethod::Post, "/echo", [](const HttpRequest& req) {
-        return HttpResponse::ok(req.body);
-    });
+    server.route(HttpMethod::Post, "/echo",
+                 [](const HttpRequest& req) { return HttpResponse::ok(req.body); });
 
     auto resp = server.post("/echo", "payload");
     EXPECT_EQ(resp.status_code, 200);
@@ -36,9 +35,8 @@ TEST(FakeHttpServerTest, DispatchesRegisteredPostRoute) {
 TEST(FakeHttpServerTest, MiddlewareRunsBeforeHandler) {
     FakeHttpServer server;
     server.use(rate_limit_middleware(0.0, 0.0));  // always exhausted
-    server.route(HttpMethod::Get, "/blocked", [](const HttpRequest&) {
-        return HttpResponse::ok("should not reach");
-    });
+    server.route(HttpMethod::Get, "/blocked",
+                 [](const HttpRequest&) { return HttpResponse::ok("should not reach"); });
 
     auto resp = server.get("/blocked");
     EXPECT_EQ(resp.status_code, 429);
@@ -57,9 +55,7 @@ TEST(FakeHttpServerTest, MultipleMiddlewaresChainInOrder) {
         order.push_back(2);
         return next(req);
     });
-    server.route(HttpMethod::Get, "/", [](const HttpRequest&) {
-        return HttpResponse::ok("");
-    });
+    server.route(HttpMethod::Get, "/", [](const HttpRequest&) { return HttpResponse::ok(""); });
 
     (void)server.get("/");
     EXPECT_EQ(order, (std::vector<int>{1, 2, 3}));
@@ -78,9 +74,8 @@ TEST(FakeHttpServerTest, GetPassesHeaders) {
 TEST(FakeHttpServerTest, ContentNegotiationMiddlewareIntegration) {
     FakeHttpServer server;
     server.use(content_negotiation_middleware({"application/json"}));
-    server.route(HttpMethod::Get, "/data", [](const HttpRequest&) {
-        return HttpResponse::ok(R"({"x":1})");
-    });
+    server.route(HttpMethod::Get, "/data",
+                 [](const HttpRequest&) { return HttpResponse::ok(R"({"x":1})"); });
 
     // Matching Accept
     auto ok = server.get("/data", {{"Accept", "application/json"}});

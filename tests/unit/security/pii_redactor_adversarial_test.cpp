@@ -1,6 +1,7 @@
 #include <pii_redactor.hpp>
-#include <gtest/gtest.h>
 #include <string>
+
+#include <gtest/gtest.h>
 
 using cpp_commons::security::PiiRedactor;
 
@@ -26,7 +27,7 @@ TEST(PiiRedactorEmailTest, NoEmailUnchanged) {
 
 TEST(PiiRedactorEmailTest, IdempotentApplication) {
     const std::string input = "user@example.com";
-    auto once  = PiiRedactor::redact_email(input);
+    auto once = PiiRedactor::redact_email(input);
     auto twice = PiiRedactor::redact_email(once);
     EXPECT_EQ(once, twice);
 }
@@ -34,23 +35,20 @@ TEST(PiiRedactorEmailTest, IdempotentApplication) {
 // ── Card redaction ────────────────────────────────────────────────────────────
 
 TEST(PiiRedactorCardTest, SpaceSeparatedCard) {
-    EXPECT_EQ(PiiRedactor::redact_card("card: 4111 1111 1111 1111 end"),
-              "card: [CARD] end");
+    EXPECT_EQ(PiiRedactor::redact_card("card: 4111 1111 1111 1111 end"), "card: [CARD] end");
 }
 
 TEST(PiiRedactorCardTest, DashSeparatedCard) {
-    EXPECT_EQ(PiiRedactor::redact_card("4111-1111-1111-1111"),
-              "[CARD]");
+    EXPECT_EQ(PiiRedactor::redact_card("4111-1111-1111-1111"), "[CARD]");
 }
 
 TEST(PiiRedactorCardTest, ContinuousCard) {
-    EXPECT_EQ(PiiRedactor::redact_card("4111111111111111"),
-              "[CARD]");
+    EXPECT_EQ(PiiRedactor::redact_card("4111111111111111"), "[CARD]");
 }
 
 TEST(PiiRedactorCardTest, IdempotentApplication) {
     const std::string input = "4111 1111 1111 1111";
-    auto once  = PiiRedactor::redact_card(input);
+    auto once = PiiRedactor::redact_card(input);
     auto twice = PiiRedactor::redact_card(once);
     EXPECT_EQ(once, twice);
 }
@@ -58,8 +56,7 @@ TEST(PiiRedactorCardTest, IdempotentApplication) {
 // ── redact_all combinations ───────────────────────────────────────────────────
 
 TEST(PiiRedactorAllTest, EmailAndCardInSameString) {
-    auto result = PiiRedactor::redact_all(
-        "user@example.com paid 4111 1111 1111 1111");
+    auto result = PiiRedactor::redact_all("user@example.com paid 4111 1111 1111 1111");
     EXPECT_EQ(result.find("example.com"), std::string::npos);
     EXPECT_EQ(result.find("4111"), std::string::npos);
     EXPECT_NE(result.find("[EMAIL]"), std::string::npos);
@@ -68,7 +65,7 @@ TEST(PiiRedactorAllTest, EmailAndCardInSameString) {
 
 TEST(PiiRedactorAllTest, IdempotentApplication) {
     const std::string input = "a@b.com has card 4111 1111 1111 1111";
-    auto once  = PiiRedactor::redact_all(input);
+    auto once = PiiRedactor::redact_all(input);
     auto twice = PiiRedactor::redact_all(once);
     EXPECT_EQ(once, twice);
 }

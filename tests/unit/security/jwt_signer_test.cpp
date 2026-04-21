@@ -1,7 +1,8 @@
-#include <jwt_signer.hpp>
 #include <jwt_decoder.hpp>
-#include <gtest/gtest.h>
+#include <jwt_signer.hpp>
 #include <string>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::security;
 
@@ -49,10 +50,9 @@ TEST(JwtSignerTest, VerifyRejectsTamperedPayload) {
     // Replace the payload segment with a different base64url value.
     auto d1 = token.find('.');
     auto d2 = token.find('.', d1 + 1);
-    std::string tampered =
-        token.substr(0, d1 + 1) +
-        "eyJzdWIiOiJoYWNrZXIiLCJpYXQiOjB9" +  // {"sub":"hacker","iat":0}
-        token.substr(d2);
+    std::string tampered = token.substr(0, d1 + 1) +
+                           "eyJzdWIiOiJoYWNrZXIiLCJpYXQiOjB9" +  // {"sub":"hacker","iat":0}
+                           token.substr(d2);
     EXPECT_THROW(signer.verify(tampered), JwtError);
 }
 

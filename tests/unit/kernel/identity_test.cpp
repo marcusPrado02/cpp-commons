@@ -1,6 +1,8 @@
-#include <cpp_commons/kernel/identity.hpp>
-#include <gtest/gtest.h>
 #include <unordered_map>
+
+#include <cpp_commons/kernel/identity.hpp>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::kernel;
 
@@ -13,7 +15,7 @@ TEST(UUIDTest, GeneratedIsUnique) {
 TEST(UUIDTest, ToStringHasCorrectFormat) {
     auto s = UUID::generate().to_string();
     EXPECT_EQ(s.size(), 36u);
-    EXPECT_EQ(s[8],  '-');
+    EXPECT_EQ(s[8], '-');
     EXPECT_EQ(s[13], '-');
     EXPECT_EQ(s[18], '-');
     EXPECT_EQ(s[23], '-');
@@ -38,7 +40,7 @@ TEST(StrongIdTest, ToStringMatchesUUID) {
 
 TEST(StrongIdTest, TypesAreDistinct) {
     // EntityId and CorrelationId are different types — won't compile if mixed
-    EntityId      eid;
+    EntityId eid;
     CorrelationId cid;
     EXPECT_NE(eid.to_string(), cid.to_string());  // different UUIDs
 }

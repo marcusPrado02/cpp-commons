@@ -19,8 +19,8 @@ public:
     void register_handler(Handler handler) {
         handlers_[std::type_index(typeid(Query))] =
             [h = std::move(handler)](const std::any& q) -> std::any {
-                return h(std::any_cast<const Query&>(q));
-            };
+            return h(std::any_cast<const Query&>(q));
+        };
     }
 
     template <typename Result, typename Query>
@@ -35,4 +35,4 @@ private:
     std::unordered_map<std::type_index, std::function<std::any(const std::any&)>> handlers_;
 };
 
-} // namespace cpp_commons::application
+}  // namespace cpp_commons::application

@@ -1,11 +1,13 @@
-#include <cpp_commons/kernel/money.hpp>
-#include <cpp_commons/errors/domain_error.hpp>
-#include <gtest/gtest.h>
 #include <limits>
 
-using cpp_commons::kernel::Money;
-using cpp_commons::kernel::CurrencyCode;
+#include <cpp_commons/errors/domain_error.hpp>
+#include <cpp_commons/kernel/money.hpp>
+
+#include <gtest/gtest.h>
+
 using cpp_commons::errors::DomainError;
+using cpp_commons::kernel::CurrencyCode;
+using cpp_commons::kernel::Money;
 
 static const CurrencyCode USD{"USD"};
 static const CurrencyCode EUR{"EUR"};

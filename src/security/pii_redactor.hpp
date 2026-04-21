@@ -16,4 +16,4 @@ public:
     [[nodiscard]] static std::string redact_all(std::string_view input);
 };
 
-} // namespace cpp_commons::security
+}  // namespace cpp_commons::security

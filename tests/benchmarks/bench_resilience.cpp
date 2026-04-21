@@ -1,6 +1,7 @@
-#include <benchmark/benchmark.h>
 #include <circuit_breaker.hpp>
 #include <retry_policy.hpp>
+
+#include <benchmark/benchmark.h>
 
 using namespace cpp_commons::resilience;
 

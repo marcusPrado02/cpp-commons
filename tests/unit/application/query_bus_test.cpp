@@ -1,19 +1,23 @@
 #include <query_bus.hpp>
-#include <gtest/gtest.h>
 #include <string>
+
+#include <gtest/gtest.h>
 
 using namespace cpp_commons::application;
 
-struct GetUser  { int id; };
-struct UserDto  { std::string name; };
+struct GetUser {
+    int id;
+};
+struct UserDto {
+    std::string name;
+};
 
 struct GetCount {};
 
 TEST(QueryBusTest, DispatchesRegisteredHandler) {
     QueryBus bus;
-    bus.register_handler<GetUser>([](const GetUser& q) -> UserDto {
-        return UserDto{"user-" + std::to_string(q.id)};
-    });
+    bus.register_handler<GetUser>(
+        [](const GetUser& q) -> UserDto { return UserDto{"user-" + std::to_string(q.id)}; });
 
     auto result = bus.query<UserDto>(GetUser{42});
     EXPECT_EQ(result.name, "user-42");
@@ -26,9 +30,8 @@ TEST(QueryBusTest, ThrowsWhenNoHandlerRegistered) {
 
 TEST(QueryBusTest, MultipleHandlersCoexist) {
     QueryBus bus;
-    bus.register_handler<GetUser>([](const GetUser& q) -> UserDto {
-        return UserDto{"u" + std::to_string(q.id)};
-    });
+    bus.register_handler<GetUser>(
+        [](const GetUser& q) -> UserDto { return UserDto{"u" + std::to_string(q.id)}; });
     bus.register_handler<GetCount>([](const GetCount&) -> int { return 7; });
 
     EXPECT_EQ(bus.query<UserDto>(GetUser{1}).name, "u1");
