@@ -7,6 +7,8 @@ namespace cpp_commons::web {
 
 enum class HttpMethod { Get, Post, Put, Patch, Delete, Head, Options };
 
+using Headers = std::unordered_map<std::string, std::string>;
+
 struct HttpRequest {
     HttpMethod method{HttpMethod::Get};
     std::string path;

@@ -3,6 +3,7 @@ add_executable(web_tests
     idempotency_middleware_test.cpp
     content_negotiation_test.cpp
     rate_limit_middleware_test.cpp
+    fake_http_server_test.cpp
 )
 
 target_include_directories(web_tests PRIVATE
