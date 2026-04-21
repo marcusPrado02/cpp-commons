@@ -1,8 +1,10 @@
 #pragma once
+#include <cpp_commons/kernel/deadline.hpp>
 #include <chrono>
 #include <cstdint>
 #include <exception>
 #include <functional>
+#include <optional>
 #include <random>
 #include <stdexcept>
 #include <thread>
@@ -28,6 +30,8 @@ struct RetryConfig {
     // Optional predicate — if set, only retry when it returns true for the
     // current exception. Non-matching exceptions propagate immediately.
     std::function<bool(std::exception_ptr)> should_retry{};
+    // Optional deadline — retries stop if deadline is exceeded.
+    std::optional<kernel::Deadline> deadline{};
 };
 
 // Build a should_retry predicate that matches exceptions of type E.
@@ -65,10 +69,16 @@ inline std::chrono::milliseconds apply_jitter(std::chrono::milliseconds base,
 // Executes fn, retrying on exception up to config.max_attempts times
 // with exponential backoff. Throws RetryExhausted if all attempts fail.
 // If cfg.should_retry is set, non-matching exceptions propagate immediately.
+struct DeadlineExceeded : std::runtime_error {
+    using std::runtime_error::runtime_error;
+};
+
 template <typename Fn>
 auto with_retry(const RetryConfig& cfg, Fn&& fn) -> decltype(fn()) {
     auto delay = cfg.initial_delay;
     for (uint32_t attempt = 0; attempt < cfg.max_attempts; ++attempt) {
+        if (cfg.deadline && cfg.deadline->is_expired())
+            throw DeadlineExceeded{"deadline exceeded before attempt " + std::to_string(attempt)};
         try {
             return fn();
         } catch (...) {
@@ -76,6 +86,8 @@ auto with_retry(const RetryConfig& cfg, Fn&& fn) -> decltype(fn()) {
             if (cfg.should_retry && !cfg.should_retry(ep))
                 std::rethrow_exception(ep);
             if (attempt + 1 < cfg.max_attempts) {
+                if (cfg.deadline && cfg.deadline->is_expired())
+                    throw DeadlineExceeded{"deadline exceeded after attempt " + std::to_string(attempt)};
                 std::this_thread::sleep_for(detail::apply_jitter(delay, cfg.jitter));
                 auto next = std::chrono::milliseconds(
                     static_cast<long long>(static_cast<double>(delay.count()) * cfg.backoff_multiplier));

@@ -7,6 +7,7 @@ add_executable(resilience_tests
 
 target_include_directories(resilience_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/resilience
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 target_link_libraries(resilience_tests PRIVATE
