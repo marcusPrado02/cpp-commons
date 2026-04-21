@@ -6,7 +6,8 @@
 
 namespace cpp_commons::observability {
 
-JsonLogger::JsonLogger(std::string service_name, std::shared_ptr<spdlog::logger> logger)  // NOLINT(cppcoreguidelines-pro-type-member-init)
+// NOLINTNEXTLINE(cppcoreguidelines-pro-type-member-init)
+JsonLogger::JsonLogger(std::string service_name, std::shared_ptr<spdlog::logger> logger)
     : service_name_(std::move(service_name)),
       logger_(logger ? std::move(logger) : spdlog::stdout_color_mt(service_name_)) {
     logger_->set_pattern(R"({"ts":"%Y-%m-%dT%H:%M:%S.%e","level":"%l","svc":"%n","msg":"%v"})");

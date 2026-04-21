@@ -5,7 +5,8 @@
 namespace cpp_commons::observability {
 
 namespace {
-thread_local CorrelationContext tl_current{};  // NOLINT(cppcoreguidelines-avoid-non-const-global-variables)
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
+thread_local CorrelationContext tl_current{};
 
 bool is_hex_string(std::string_view s, std::size_t expected_len) noexcept {
     if (s.size() != expected_len)

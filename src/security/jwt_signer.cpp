@@ -173,6 +173,7 @@ std::string JwtSigner::sign(nlohmann::json payload) const {
     std::string h_b64 = base64url_encode(header.dump());
     std::string p_b64 = base64url_encode(payload.dump());
     std::string signing_input = h_b64 + '.' + p_b64;
+    // NOLINTNEXTLINE(cppcoreguidelines-init-variables)
     std::string sig = base64url_encode(hmac_sha256(secret_, signing_input));
     return signing_input + '.' + sig;
 }
