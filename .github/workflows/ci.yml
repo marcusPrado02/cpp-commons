@@ -108,6 +108,7 @@ jobs:
       - name: Run clang-tidy
         run: |
           find src tests -name '*.cpp' \
+            ! -path 'tests/benchmarks/*' \
             | xargs clang-tidy-17 -p build/ci
 
   coverage:

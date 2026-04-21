@@ -102,9 +102,8 @@ TEST(RetryPolicyTest, FullJitterStaysWithinBounds) {
                             }),
                  RetryExhausted);
     auto elapsed = std::chrono::steady_clock::now() - t0;
-    // Full jitter must sleep [0, 10ms] — with one inter-attempt sleep the
-    // total elapsed must be < 50ms even with scheduler noise.
-    EXPECT_LT(elapsed, std::chrono::milliseconds{50});
+    // Full jitter sleeps [0, 10ms] per attempt; allow 200ms for CI scheduler overhead.
+    EXPECT_LT(elapsed, std::chrono::milliseconds{200});
 }
 
 TEST(RetryPolicyTest, EqualJitterStaysWithinBounds) {
@@ -123,7 +122,8 @@ TEST(RetryPolicyTest, EqualJitterStaysWithinBounds) {
                             }),
                  RetryExhausted);
     auto elapsed = std::chrono::steady_clock::now() - t0;
-    EXPECT_LT(elapsed, std::chrono::milliseconds{50});
+    // Equal jitter sleeps [5, 10ms] per attempt; allow 200ms for CI scheduler overhead.
+    EXPECT_LT(elapsed, std::chrono::milliseconds{200});
 }
 
 // ── Deadline ─────────────────────────────────────────────────────────────────

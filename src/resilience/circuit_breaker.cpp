@@ -2,7 +2,7 @@
 
 namespace cpp_commons::resilience {
 
-CircuitBreaker::CircuitBreaker(CircuitBreakerConfig cfg) : cfg_(std::move(cfg)) {}
+CircuitBreaker::CircuitBreaker(CircuitBreakerConfig cfg) : cfg_(cfg) {}
 
 bool CircuitBreaker::is_open() const noexcept {
     std::lock_guard lk{mu_};

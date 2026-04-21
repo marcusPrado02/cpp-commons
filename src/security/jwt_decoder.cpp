@@ -6,24 +6,19 @@ namespace cpp_commons::security {
 
 namespace {
 
+constexpr int decode_char(char c) noexcept {
+    if (c >= 'A' && c <= 'Z') return c - 'A';
+    if (c >= 'a' && c <= 'z') return c - 'a' + 26;
+    if (c >= '0' && c <= '9') return c - '0' + 52;
+    if (c == '+' || c == '-') return 62;
+    if (c == '/' || c == '_') return 63;
+    return -1;
+}
+
 // Base64url decode (RFC 4648 §5) without padding.
 std::string base64url_decode(std::string_view encoded) {
-    std::string out;
+    std::string out{};
     out.reserve(encoded.size() * 3 / 4);
-
-    auto decode_char = [](char c) -> int {
-        if (c >= 'A' && c <= 'Z')
-            return c - 'A';
-        if (c >= 'a' && c <= 'z')
-            return c - 'a' + 26;
-        if (c >= '0' && c <= '9')
-            return c - '0' + 52;
-        if (c == '+' || c == '-')
-            return 62;
-        if (c == '/' || c == '_')
-            return 63;
-        return -1;
-    };
 
     int buf = 0;
     int bits = 0;

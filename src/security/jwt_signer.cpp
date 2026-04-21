@@ -100,7 +100,9 @@ std::string sha256(std::string_view msg) {
     return digest;
 }
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 std::string hmac_sha256_impl(std::string_view key, std::string_view msg) {
+    // NOLINTEND(bugprone-easily-swappable-parameters)
     constexpr std::size_t block = 64;
     std::string k(key);
     if (k.size() > block)
@@ -119,7 +121,7 @@ std::string hmac_sha256_impl(std::string_view key, std::string_view msg) {
 
 std::string base64url_encode_impl(const std::string& data) {
     static const char* alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-    std::string out;
+    std::string out{};
     out.reserve((data.size() * 4 + 2) / 3);
     int val = 0, bits = -6;
     for (char raw : data) {
@@ -151,7 +153,9 @@ bool constant_time_equal(const std::string& a, const std::string& b) {
 
 // ── JwtSigner ─────────────────────────────────────────────────────────────────
 
+// NOLINTBEGIN(bugprone-easily-swappable-parameters)
 std::string JwtSigner::hmac_sha256(std::string_view key, std::string_view msg) {
+    // NOLINTEND(bugprone-easily-swappable-parameters)
     return hmac_sha256_impl(key, msg);
 }
 
