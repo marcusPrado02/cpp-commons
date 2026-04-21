@@ -2,6 +2,8 @@ add_executable(security_tests
     security_test.cpp
     secure_random_test.cpp
     jwt_signer_test.cpp
+    jwt_decoder_adversarial_test.cpp
+    pii_redactor_adversarial_test.cpp
     key_rotation_service_test.cpp
 )
 
