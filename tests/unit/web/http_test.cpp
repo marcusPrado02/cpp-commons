@@ -1,6 +1,7 @@
 #include <http_request.hpp>
 #include <http_response.hpp>
 #include <middleware_chain.hpp>
+#include <cors_middleware.hpp>
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::web;
@@ -109,4 +110,72 @@ TEST(MiddlewareChainTest, MiddlewareCanShortCircuit) {
         return HttpResponse::ok("should not reach");
     });
     EXPECT_EQ(resp.status_code, 401);
+}
+
+// ── CORS middleware ───────────────────────────────────────────────────────────
+
+TEST(CorsMiddlewareTest, WildcardOriginOnNormalRequest) {
+    MiddlewareChain chain;
+    chain.use(cors_middleware());
+
+    HttpRequest req;
+    req.headers["Origin"] = "https://example.com";
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("ok"); });
+
+    EXPECT_EQ(resp.status_code, 200);
+    EXPECT_EQ(resp.headers.at("Access-Control-Allow-Origin"), "*");
+}
+
+TEST(CorsMiddlewareTest, PreflightReturns204WithCorsHeaders) {
+    MiddlewareChain chain;
+    chain.use(cors_middleware());
+
+    HttpRequest req;
+    req.method = HttpMethod::Options;
+    req.headers["Origin"] = "https://example.com";
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("never"); });
+
+    EXPECT_EQ(resp.status_code, 204);
+    EXPECT_EQ(resp.headers.at("Access-Control-Allow-Origin"), "*");
+    EXPECT_FALSE(resp.headers.at("Access-Control-Allow-Methods").empty());
+    EXPECT_FALSE(resp.headers.at("Access-Control-Max-Age").empty());
+}
+
+TEST(CorsMiddlewareTest, RestrictedOriginAllowed) {
+    CorsOptions opts;
+    opts.allowed_origins = {"https://trusted.com"};
+    MiddlewareChain chain;
+    chain.use(cors_middleware(std::move(opts)));
+
+    HttpRequest req;
+    req.headers["Origin"] = "https://trusted.com";
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("ok"); });
+
+    EXPECT_EQ(resp.headers.at("Access-Control-Allow-Origin"), "https://trusted.com");
+}
+
+TEST(CorsMiddlewareTest, UnknownOriginGetsNoHeader) {
+    CorsOptions opts;
+    opts.allowed_origins = {"https://trusted.com"};
+    MiddlewareChain chain;
+    chain.use(cors_middleware(std::move(opts)));
+
+    HttpRequest req;
+    req.headers["Origin"] = "https://evil.com";
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("ok"); });
+
+    EXPECT_EQ(resp.headers.count("Access-Control-Allow-Origin"), 0u);
+}
+
+TEST(CorsMiddlewareTest, CredentialsFlagPropagated) {
+    CorsOptions opts;
+    opts.allow_credentials = true;
+    MiddlewareChain chain;
+    chain.use(cors_middleware(std::move(opts)));
+
+    HttpRequest req;
+    req.headers["Origin"] = "https://example.com";
+    auto resp = chain.dispatch(req, [](const HttpRequest&) { return HttpResponse::ok("ok"); });
+
+    EXPECT_EQ(resp.headers.at("Access-Control-Allow-Credentials"), "true");
 }
