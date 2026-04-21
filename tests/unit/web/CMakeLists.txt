@@ -5,6 +5,8 @@ add_executable(web_tests
     rate_limit_middleware_test.cpp
     fake_http_server_test.cpp
     health_handler_test.cpp
+    http_response_from_error_test.cpp
+    cors_middleware_test.cpp
 )
 
 target_include_directories(web_tests PRIVATE

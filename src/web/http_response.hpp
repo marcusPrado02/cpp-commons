@@ -1,4 +1,5 @@
 #pragma once
+#include <cpp_commons/errors/domain_error.hpp>
 #include <cpp_commons/errors/problem_details.hpp>
 #include <string>
 #include <unordered_map>
@@ -45,6 +46,29 @@ struct HttpResponse {
 
     [[nodiscard]] static HttpResponse internal_error() {
         return from_problem(errors::ProblemDetails::internal_error());
+    }
+
+    // Automatic mapping from domain/application error hierarchy to HTTP responses.
+    [[nodiscard]] static HttpResponse from_error(const std::exception& e) {
+        using namespace errors;
+        if (dynamic_cast<const NotFoundError*>(&e))
+            return not_found(e.what());
+        if (dynamic_cast<const ValidationError*>(&e))
+            return bad_request(e.what());
+        if (dynamic_cast<const UnauthorizedError*>(&e))
+            return unauthorized();
+        if (dynamic_cast<const ForbiddenError*>(&e))
+            return from_problem({std::string{error_type::forbidden}, "Forbidden",
+                                 403, e.what(), ""});
+        if (dynamic_cast<const ConflictError*>(&e))
+            return conflict(e.what());
+        if (dynamic_cast<const RateLimitError*>(&e))
+            return from_problem({std::string{error_type::rate_limited}, "Too Many Requests",
+                                 429, e.what(), ""});
+        if (dynamic_cast<const TimeoutError*>(&e))
+            return from_problem({std::string{error_type::timeout}, "Gateway Timeout",
+                                 504, e.what(), ""});
+        return internal_error();
     }
 };
 
