@@ -1,6 +1,7 @@
 add_executable(application_tests
     use_case_test.cpp
     command_bus_test.cpp
+    query_bus_test.cpp
     mediator_test.cpp
     tracing_middleware_test.cpp
 )
