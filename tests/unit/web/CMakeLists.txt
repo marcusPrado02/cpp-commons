@@ -7,6 +7,7 @@ add_executable(web_tests
     health_handler_test.cpp
     http_response_from_error_test.cpp
     cors_middleware_test.cpp
+    body_limit_middleware_test.cpp
 )
 
 target_include_directories(web_tests PRIVATE
