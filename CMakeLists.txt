@@ -102,6 +102,9 @@ FetchContent_MakeAvailable(yaml_cpp)
 # OpenSSL (system)
 find_package(OpenSSL QUIET)
 
+# zlib (system)
+find_package(ZLIB QUIET)
+
 # ── INTERFACE (header-only) targets ──────────────────────────────────────────
 
 add_library(cpp_commons_kernel INTERFACE)

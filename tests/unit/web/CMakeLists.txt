@@ -8,6 +8,7 @@ add_executable(web_tests
     http_response_from_error_test.cpp
     cors_middleware_test.cpp
     body_limit_middleware_test.cpp
+    compression_middleware_test.cpp
 )
 
 target_include_directories(web_tests PRIVATE

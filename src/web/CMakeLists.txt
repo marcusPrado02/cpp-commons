@@ -21,3 +21,8 @@ target_link_libraries(cpp_commons_web
         nlohmann_json::nlohmann_json
         asio::asio
 )
+
+if(ZLIB_FOUND)
+    target_compile_definitions(cpp_commons_web PUBLIC CPP_COMMONS_HAS_ZLIB)
+    target_link_libraries(cpp_commons_web PRIVATE ZLIB::ZLIB)
+endif()
