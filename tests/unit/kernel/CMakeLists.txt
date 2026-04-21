@@ -8,6 +8,7 @@ add_executable(kernel_tests
     domain_event_test.cpp
     aggregate_root_test.cpp
     specification_test.cpp
+    money_test.cpp
 )
 target_link_libraries(kernel_tests PRIVATE
     cpp_commons::kernel
