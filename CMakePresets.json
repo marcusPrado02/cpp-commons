@@ -27,9 +27,10 @@
       "inherits": "base",
       "binaryDir": "${sourceDir}/build/ci",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE":              "Release",
-        "CPP_COMMONS_BUILD_TESTS":       "ON",
-        "CPP_COMMONS_ENABLE_SANITIZERS": "undefined"
+        "CMAKE_BUILD_TYPE":                "Release",
+        "CPP_COMMONS_BUILD_TESTS":         "ON",
+        "CPP_COMMONS_ENABLE_SANITIZERS":   "undefined",
+        "CMAKE_EXPORT_COMPILE_COMMANDS":   "ON"
       }
     },
     {
