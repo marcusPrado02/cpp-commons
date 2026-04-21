@@ -2,6 +2,7 @@ add_executable(resilience_tests
     retry_policy_test.cpp
     circuit_breaker_test.cpp
     bulkhead_test.cpp
+    rate_limiter_test.cpp
 )
 
 target_include_directories(resilience_tests PRIVATE
