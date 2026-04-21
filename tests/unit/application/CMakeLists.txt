@@ -6,6 +6,7 @@ add_executable(application_tests
     tracing_middleware_test.cpp
     outbox_publisher_test.cpp
     instrumented_use_case_test.cpp
+    saga_orchestrator_test.cpp
 )
 
 target_include_directories(application_tests PRIVATE
