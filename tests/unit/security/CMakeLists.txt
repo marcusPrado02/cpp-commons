@@ -1,5 +1,6 @@
 add_executable(security_tests
     security_test.cpp
+    secure_random_test.cpp
 )
 
 target_include_directories(security_tests PRIVATE
