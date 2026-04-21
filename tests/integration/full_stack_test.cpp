@@ -22,7 +22,7 @@ using namespace cpp_commons;
 
 TEST(FullStackIntegration, CorrelationPropagatesIntoLogger) {
     // JsonLogger picks up context from thread_local — no manual threading.
-    testing::internal::CaptureStderr();
+    testing::internal::CaptureStdout();
 
     observability::JsonLogger log{"test-svc"};
     auto ctx = observability::CorrelationContext::generate();
@@ -33,6 +33,7 @@ TEST(FullStackIntegration, CorrelationPropagatesIntoLogger) {
         EXPECT_EQ(observability::current_correlation().tenant_id, "tenant-x");
     }
     EXPECT_TRUE(observability::current_correlation().empty());
+    testing::internal::GetCapturedStdout();  // discard
 }
 
 // ── Integration: RetryPolicy + CircuitBreaker ────────────────────────────────
@@ -136,4 +137,19 @@ TEST(FullStackIntegration, ProblemDetailsRoundTrip) {
     auto resp = web::HttpResponse::from_problem(pd);
     EXPECT_EQ(resp.status_code, 404);
     EXPECT_FALSE(resp.body.empty());
+}
+
+// ── Integration: JsonLogger structured fields ─────────────────────────────────
+
+TEST(FullStackIntegration, StructuredFieldsAppearedInOutput) {
+    testing::internal::CaptureStdout();
+
+    observability::JsonLogger log{"fields-test"};
+    log.info("order placed", {{"order_id", "ord-42"}, {"amount", "4200"}});
+
+    auto out = testing::internal::GetCapturedStdout();
+    EXPECT_NE(out.find("order placed"), std::string::npos);
+    EXPECT_NE(out.find("order_id"), std::string::npos);
+    EXPECT_NE(out.find("ord-42"), std::string::npos);
+    EXPECT_NE(out.find("amount"), std::string::npos);
 }
