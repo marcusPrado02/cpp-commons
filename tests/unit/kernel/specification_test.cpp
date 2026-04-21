@@ -23,11 +23,23 @@ public:
     }
 };
 
+class NamedSpec : public Specification<Product> {
+public:
+    explicit NamedSpec(std::string name) : name_{std::move(name)} {}
+    [[nodiscard]] bool is_satisfied_by(const Product&) const override { return true; }
+    [[nodiscard]] std::string to_string() const override { return name_; }
+private:
+    std::string name_;
+};
+
 static Spec<Product> make_above(int t) {
     return Spec<Product>{std::make_shared<PriceAbove>(t)};
 }
 static Spec<Product> make_in_stock() {
     return Spec<Product>{std::make_shared<InStock>()};
+}
+static Spec<Product> named(const std::string& n) {
+    return Spec<Product>{std::make_shared<NamedSpec>(n)};
 }
 
 TEST(SpecificationTest, SimpleSpec) {
@@ -99,4 +111,26 @@ TEST(SpecificationTest, OrOfNotOrAnd) {
     EXPECT_TRUE(spec.is_satisfied_by(Product{300, true}));  // expensive & in_stock
     EXPECT_TRUE(spec.is_satisfied_by(Product{30, false}));  // cheap
     EXPECT_FALSE(spec.is_satisfied_by(Product{150, true})); // mid-range, in stock
+}
+
+// ── to_string ─────────────────────────────────────────────────────────────────
+
+TEST(SpecificationTest, ToStringAndComposition) {
+    auto spec = named("price>100") && named("in_stock");
+    EXPECT_EQ(spec.to_string(), "(price>100 && in_stock)");
+}
+
+TEST(SpecificationTest, ToStringOrComposition) {
+    auto spec = named("A") || named("B");
+    EXPECT_EQ(spec.to_string(), "(A || B)");
+}
+
+TEST(SpecificationTest, ToStringNotComposition) {
+    auto spec = !named("in_stock");
+    EXPECT_EQ(spec.to_string(), "(!in_stock)");
+}
+
+TEST(SpecificationTest, ToStringNestedComposition) {
+    auto spec = (named("A") && named("B")) || !named("C");
+    EXPECT_EQ(spec.to_string(), "((A && B) || (!C))");
 }

@@ -13,11 +13,12 @@
       "inherits": "base",
       "binaryDir": "${sourceDir}/build/dev",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE":              "Debug",
-        "CPP_COMMONS_BUILD_TESTS":       "ON",
-        "CPP_COMMONS_BUILD_EXAMPLES":    "ON",
-        "CPP_COMMONS_ENABLE_SANITIZERS": "address",
-        "CPP_COMMONS_ENABLE_CLANG_TIDY": "ON"
+        "CMAKE_BUILD_TYPE":                    "Debug",
+        "CPP_COMMONS_BUILD_TESTS":             "ON",
+        "CPP_COMMONS_BUILD_EXAMPLES":          "ON",
+        "CPP_COMMONS_ENABLE_SANITIZERS":       "address",
+        "CPP_COMMONS_ENABLE_CLANG_TIDY":       "ON",
+        "CMAKE_CXX_COMPILER_LAUNCHER":         "ccache"
       }
     },
     {

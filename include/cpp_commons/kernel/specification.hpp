@@ -1,5 +1,7 @@
 #pragma once
 #include <memory>
+#include <string>
+#include <typeinfo>
 
 namespace cpp_commons::kernel {
 
@@ -8,6 +10,9 @@ class Specification {
 public:
     virtual ~Specification() = default;
     [[nodiscard]] virtual bool is_satisfied_by(const T& candidate) const = 0;
+    // Human-readable description for logging rejected candidates.
+    // Override in concrete specs to produce domain-meaningful messages.
+    [[nodiscard]] virtual std::string to_string() const { return typeid(*this).name(); }
 };
 
 template<typename T>
@@ -18,6 +23,9 @@ public:
 
     [[nodiscard]] bool is_satisfied_by(const T& c) const override {
         return left_->is_satisfied_by(c) && right_->is_satisfied_by(c);
+    }
+    [[nodiscard]] std::string to_string() const override {
+        return "(" + left_->to_string() + " && " + right_->to_string() + ")";
     }
 private:
     std::shared_ptr<Specification<T>> left_, right_;
@@ -32,6 +40,9 @@ public:
     [[nodiscard]] bool is_satisfied_by(const T& c) const override {
         return left_->is_satisfied_by(c) || right_->is_satisfied_by(c);
     }
+    [[nodiscard]] std::string to_string() const override {
+        return "(" + left_->to_string() + " || " + right_->to_string() + ")";
+    }
 private:
     std::shared_ptr<Specification<T>> left_, right_;
 };
@@ -44,6 +55,9 @@ public:
     [[nodiscard]] bool is_satisfied_by(const T& c) const override {
         return !spec_->is_satisfied_by(c);
     }
+    [[nodiscard]] std::string to_string() const override {
+        return "(!" + spec_->to_string() + ")";
+    }
 private:
     std::shared_ptr<Specification<T>> spec_;
 };
@@ -55,6 +69,7 @@ public:
     explicit Spec(std::shared_ptr<Specification<T>> impl) : impl_{std::move(impl)} {}
 
     [[nodiscard]] bool is_satisfied_by(const T& c) const { return impl_->is_satisfied_by(c); }
+    [[nodiscard]] std::string to_string() const { return impl_->to_string(); }
 
     [[nodiscard]] Spec operator&&(const Spec& o) const {
         return Spec{std::make_shared<AndSpecification<T>>(impl_, o.impl_)};
