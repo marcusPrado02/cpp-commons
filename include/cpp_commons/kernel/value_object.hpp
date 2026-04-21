@@ -1,7 +1,13 @@
+/// @file value_object.hpp
+/// @brief CRTP base for immutable DDD value objects with structural equality.
 #pragma once
 
 namespace cpp_commons::kernel {
 
+/// @brief CRTP base for DDD value objects.
+///
+/// Derived class must expose `auto fields() const` returning a comparable tuple.
+/// Copy-assign is deleted; equality is delegated to `fields()` comparison.
 // CRTP base — derived class must expose `fields()` returning a tuple.
 // Provides value-based equality and immutability (no copy-assign).
 template<typename Derived>

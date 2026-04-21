@@ -1,3 +1,5 @@
+/// @file identity.hpp
+/// @brief RFC 4122 v4 UUID and tag-dispatched StrongId with std::hash support.
 #pragma once
 #include <array>
 #include <charconv>
@@ -11,6 +13,10 @@
 
 namespace cpp_commons::kernel {
 
+/// @brief Randomly-generated RFC 4122 version-4 UUID.
+///
+/// Two halves stored as uint64_t. Use `generate()` for new ids, `from_string()`
+/// to deserialise from HTTP/JSON/DB. `std::hash` specialisation provided.
 class UUID {
 public:
     static UUID generate() {
@@ -80,6 +86,10 @@ private:
     uint64_t lo_{};
 };
 
+/// @brief Tag-dispatched UUID wrapper preventing implicit cross-domain id mixing.
+///
+/// `StrongId<OrderTag>` and `StrongId<UserId>` are different types at compile
+/// time even though both hold a UUID internally.
 template<typename Tag>
 class StrongId {
 public:

@@ -1,9 +1,16 @@
+/// @file result.hpp
+/// @brief Railway-oriented error handling — wraps tl::expected with a monadic API.
 #pragma once
 #include <tl/expected.hpp>
 #include <utility>
 
 namespace cpp_commons::kernel {
 
+/// @brief Represents either a successful value (`T`) or an error (`E`).
+///
+/// Modelled on Rust's `Result<T,E>`. Use `Result::ok()` / `Result::err()` to
+/// construct, `is_ok()` / `is_err()` to inspect, and `map` / `and_then` /
+/// `map_err` for railway-oriented chaining.
 template<typename T, typename E>
 class Result {
 public:

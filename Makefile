@@ -37,8 +37,9 @@ coverage:
 
 docs:
 	@command -v doxygen >/dev/null 2>&1 || { echo "doxygen not found — install it first"; exit 1; }
-	doxygen Doxyfile
-	@echo "Documentation: docs/doxygen/html/index.html"
+	cmake --preset=dev
+	cmake --build build/dev --target doc
+	@echo "Documentation: build/dev/docs/html/index.html"
 
 install:
 	cmake --preset=release

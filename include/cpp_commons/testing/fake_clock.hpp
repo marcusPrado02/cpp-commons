@@ -1,9 +1,11 @@
+/// @file fake_clock.hpp
+/// @brief FakeClock — deterministic Clock implementation for time-sensitive tests.
 #pragma once
 #include <cpp_commons/kernel/clock.hpp>
 
 namespace cpp_commons::testing {
 
-// FakeClock satisfies the Clock concept and allows manual time control.
+/// @brief Clock whose time advances only when you call `set()` or `advance()`.
 class FakeClock {
 public:
     explicit FakeClock(kernel::TimePoint t = std::chrono::system_clock::now()) : now_{t} {}

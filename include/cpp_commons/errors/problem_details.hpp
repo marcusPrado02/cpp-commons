@@ -1,3 +1,5 @@
+/// @file problem_details.hpp
+/// @brief RFC 9457 ProblemDetails — structured JSON error body for HTTP APIs.
 #pragma once
 #include "error_codes.hpp"
 #include <nlohmann/json.hpp>
@@ -5,6 +7,9 @@
 
 namespace cpp_commons::errors {
 
+/// @brief RFC 9457 error document: `type`, `title`, `status`, `detail`, `instance`.
+///
+/// Use the static factory helpers (`not_found`, `conflict`, …) for standard cases.
 struct ProblemDetails {
     std::string type;
     std::string title;

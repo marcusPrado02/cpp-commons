@@ -7,7 +7,7 @@
 
 ## CI/CD & Quality Gates
 
-- [ ] **[P0] GitHub Actions — pipeline principal**  
+- [x] **[P0] GitHub Actions — pipeline principal**  
   Criar `.github/workflows/ci.yml` com stages: configure → build → test → lint → format-check. Executar em push e pull_request para `main`.
 
 - [ ] **[P0] Matrix de compiladores**  
@@ -19,38 +19,38 @@
 - [ ] **[P0] UBSan no preset `ci`**  
   Corrigir `CMakePresets.json`: preset `ci` declara `"CPP_COMMONS_ENABLE_SANITIZERS": "address"` mas a spec diz UBSan. Separar em dois jobs: ASan (dev) e UBSan (ci).
 
-- [ ] **[P0] Cobertura de testes com gcov/lcov**  
+- [x] **[P0] Cobertura de testes com gcov/lcov**  
   Adicionar preset `coverage` com `-DCMAKE_CXX_FLAGS=--coverage`. Gerar relatório HTML via `lcov` e publicar no GitHub Pages ou Codecov. Gate mínimo: 80% de cobertura de linhas.
 
-- [ ] **[P0] Gate de clang-tidy no CI**  
+- [x] **[P0] Gate de clang-tidy no CI**  
   Executar `run-clang-tidy -p build/ci` nos arquivos de `include/` e `src/`. O CI deve falhar se houver findings. Excluir `_deps/` do scan.
 
-- [ ] **[P0] Gate de clang-format no CI**  
+- [x] **[P0] Gate de clang-format no CI**  
   Executar `clang-format --dry-run --Werror` em todos os `.hpp` e `.cpp` do projeto. Nenhum diff aceito.
 
-- [ ] **[P1] Release automation**  
+- [x] **[P1] Release automation**  
   Workflow `.github/workflows/release.yml` acionado por tag `v*`. Gera changelog via `git-cliff` ou similar, cria GitHub Release com binários e tarball de headers.
 
-- [ ] **[P1] Dependabot para FetchContent**  
+- [x] **[P1] Dependabot para FetchContent**  
   Criar `.github/dependabot.yml` para alertar sobre novas versões de tl-expected, nlohmann_json, spdlog, googletest e google-benchmark.
 
-- [ ] **[P2] Build em macOS no CI**  
+- [x] **[P2] Build em macOS no CI**  
   Adicionar job `macos-latest` com Apple Clang 15. Garantir portabilidade POSIX além de Linux.
 
 ---
 
 ## Documentação
 
-- [ ] **[P0] README.md completo**  
+- [x] **[P0] README.md completo**  
   O arquivo atual está vazio. Escrever: o que é a lib, como adicionar via FetchContent, tabela de módulos, exemplo de 15 linhas com `PlaceOrderUseCase`, badges de CI/cobertura.
 
-- [ ] **[P0] Doxygen em todos os headers públicos**  
+- [x] **[P0] Doxygen em todos os headers públicos**  
   Adicionar `/** @brief ... */` em cada classe, função e concept em `include/cpp_commons/**`. Criar `Doxyfile` e target CMake `doc` que gera HTML.
 
-- [ ] **[P1] CONTRIBUTING.md**  
+- [x] **[P1] CONTRIBUTING.md**  
   Explicar: como montar o ambiente com o preset `dev`, convenções de código, processo de PR, como escrever testes, regras de commit.
 
-- [ ] **[P1] Guia de migração de ts-commons / python-commons**  
+- [x] **[P1] Guia de migração de ts-commons / python-commons**  
   Tabela mapeando construtos equivalentes (`Result<T,E>` ≡ `Either<L,R>`, `UseCase` ≡ `UseCase`, `CorrelationContext` ≡ `AsyncLocalStorage`, etc.).
 
 - [ ] **[P1] ADRs (Architecture Decision Records)**  
@@ -66,22 +66,22 @@
 
 ## Kernel
 
-- [ ] **[P0] `std::hash` para `UUID` e `StrongId<Tag>`**  
+- [x] **[P0] `std::hash` para `UUID` e `StrongId<Tag>`**  
   `FakeRepository` usa `std::map` como workaround porque não há `std::hash`. Adicionar especialização em `identity.hpp` usando `hi_ ^ (lo_ * 0x9e3779b97f4a7c15ULL)` (hash combiner). Isso remove a limitação e permite `unordered_map` em qualquer adaptador de repositório.
 
-- [ ] **[P0] `UUID::from_string(std::string_view)` — parser**  
+- [x] **[P0] `UUID::from_string(std::string_view)` — parser**  
   Necessário para desserializar IDs recebidos via HTTP, Kafka, banco de dados. Retornar `Result<UUID, ParseError>`. Validar formato `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.
 
-- [ ] **[P1] `Result<T,E>` — métodos `map_err`, `flatten`, `transform_error`**  
+- [x] **[P1] `Result<T,E>` — métodos `map_err`, `flatten`, `transform_error`**  
   Completar a API railway-oriented: `map_err` transforma o tipo de erro; `flatten` achata `Result<Result<T,E>,E>`; `transform_error` converte entre hierarquias de erro.
 
-- [ ] **[P1] `Option<T>` — métodos `map`, `filter`, `value_or_else`**  
+- [x] **[P1] `Option<T>` — métodos `map`, `filter`, `value_or_else`**  
   `map` transforma o valor interno sem desembrulhar; `filter` descarta se predicado falhar; `value_or_else` aceita callable em vez de valor estático.
 
-- [ ] **[P1] `Money` value object**  
+- [x] **[P1] `Money` value object**  
   `Money{int64_t cents, CurrencyCode currency}`. Operadores de soma, subtração, comparação. `to_string()` formatado. `operator+` retorna `Result<Money, DomainError>` em overflow. Invariante: moedas devem ser iguais para operar.
 
-- [ ] **[P1] `Email` e `PhoneNumber` value objects**  
+- [x] **[P1] `Email` e `PhoneNumber` value objects**  
   `Email::parse(std::string_view)` retorna `Result<Email, ValidationError>` com regex RFC 5322 simplificada. `PhoneNumber` valida E.164. Ambos são `ValueObject<T>` com CRTP.
 
 - [ ] **[P2] `Specification<T>` — testes de composição completos**  
@@ -106,7 +106,7 @@
 - [ ] **[P1] Validação com predicados**  
   `require<int>("PORT", [](int v){ return v > 0 && v < 65536; })` — falha com mensagem descritiva se predicado retornar false. Compõe com `env_as<T>`.
 
-- [ ] **[P2] Hot reload de configuração**  
+- [x] **[P2] Hot reload de configuração**  
   `ConfigWatcher` que detecta mudanças em `.env` ou arquivo e notifica callbacks registrados. Usar `inotify` no Linux, `kqueue` no macOS.
 
 ---
@@ -131,7 +131,7 @@
 - [ ] **[P2] Nível de log por módulo**  
   `JsonLogger::set_level("cpp_commons.resilience", spdlog::level::warn)` para silenciar módulos verbose em produção sem afetar o restante.
 
-- [ ] **[P2] Multi-sink logger**  
+- [x] **[P2] Multi-sink logger**  
   Suporte a saída simultânea para stdout (JSON) e arquivo rotativo (`spdlog::rotating_logger_mt`). Configurável via `Settings`.
 
 ---
@@ -156,7 +156,7 @@
 - [ ] **[P1] `CircuitBreaker` — testes de concorrência**  
   Testes atuais são single-threaded. Adicionar teste com 8 threads chamando simultaneamente, verificar que transições de estado são thread-safe e sem data race (rodar com TSan).
 
-- [ ] **[P2] `Hedge` — paralelismo otimista**  
+- [x] **[P2] `Hedge` — paralelismo otimista**  
   Dispara segunda requisição se a primeira demorar mais que `p95_latency`. Retorna a que chegar primeiro. Cancela a outra. Útil para reduzir tail latency.
 
 ---
@@ -178,7 +178,7 @@
 - [ ] **[P1] `UseCase` com decoradores de métricas**  
   Decorator que injeta contadores (`use_case.calls`, `use_case.errors`, `use_case.duration_ms`) automaticamente. Configurável com `MetricsPort`.
 
-- [ ] **[P2] `SagaOrchestrator`**  
+- [x] **[P2] `SagaOrchestrator`**  
   Implementa padrão Saga: sequência de steps com compensações. Cada step produz `Result<NextStep, CompensationChain>`. Persiste estado para recovery após falha.
 
 ---
@@ -200,10 +200,10 @@
 - [ ] **[P1] `HttpResponse::from_error(DomainError)` — mapeamento completo**  
   Mapeamento automático: `NotFoundError` → 404 + ProblemDetails, `ValidationError` → 422, `UnauthorizedError` → 401, `ConflictError` → 409. Eliminar switch/if em cada handler.
 
-- [ ] **[P2] Request body size limiting middleware**  
+- [x] **[P2] Request body size limiting middleware**  
   Rejeita requests com `Content-Length` acima do limite configurado. Retorna 413. Proteção contra ataques de upload de payload grande.
 
-- [ ] **[P2] Compression middleware**  
+- [x] **[P2] Compression middleware**  
   Middleware que comprime response com gzip/deflate se cliente aceitar (`Accept-Encoding`). Usar zlib (disponível em qualquer Linux).
 
 ---
@@ -219,13 +219,13 @@
 - [ ] **[P0] Testes completos para `PiiRedactor`**  
   Adicionar: múltiplos emails na mesma string, cartão sem separadores, CPF, CNPJ, telefone, combinação de padrões no mesmo input. Testar que redação não produz output diferente ao re-aplicar.
 
-- [ ] **[P1] `SecureRandom` — geração de tokens**  
+- [x] **[P1] `SecureRandom` — geração de tokens**  
   `SecureRandom::generate_token(32)` — 32 bytes de `/dev/urandom` encodados em base64url. Para reset de senha, CSRF tokens, API keys temporárias. Diferente de UUID que é previsível em sequência.
 
 - [ ] **[P1] `KeyRotationService`**  
   Gerencia versões de chave AES-GCM. `encrypt(data)` usa chave atual e tag versão no output. `decrypt(ciphertext)` seleciona chave pela versão. Permite rotação sem downtime.
 
-- [ ] **[P2] Password hashing com Argon2**  
+- [x] **[P2] Password hashing com Argon2**  
   `PasswordHasher::hash(password)` e `verify(password, hash)` usando `libsodium` ou `argon2` via FetchContent. Distinção clara de `ApiKey` (para autenticação de serviço) vs passwords de usuário.
 
 ---
@@ -244,7 +244,7 @@
 - [ ] **[P1] Teste de concorrência para `InMemoryEventBus`**  
   Publicação e subscrição simultâneas de 4 threads. Verificar ausência de data race com TSan. Documentar garantias de thread safety.
 
-- [ ] **[P2] Benchmark baseline persistido**  
+- [x] **[P2] Benchmark baseline persistido**  
   Salvar output de `cpp_commons_benchmarks --benchmark_format=json` como artefato no CI. Comparar com run anterior e alertar se regressão > 10%.
 
 ---
@@ -254,10 +254,10 @@
 - [ ] **[P0] `.devcontainer/devcontainer.json`**  
   Dev Container com Ubuntu 24.04, GCC 13, Clang 17, Ninja, cmake 3.28, clang-tidy, clang-format pré-instalados. Permite onboarding em 1 clique via VS Code Remote Containers ou GitHub Codespaces.
 
-- [ ] **[P1] `.pre-commit-config.yaml`**  
+- [x] **[P1] `.pre-commit-config.yaml`**  
   Hooks: `clang-format` (auto-fix em staged files), `cmake-format`, `trailing-whitespace`, `end-of-file-fixer`. Instalar com `pre-commit install` documentado no CONTRIBUTING.
 
-- [ ] **[P1] `.vscode/settings.json` e `extensions.json`**  
+- [x] **[P1] `.vscode/settings.json` e `extensions.json`**  
   Configurar `clangd` com `compile_commands.json`, `cmake-tools` apontando para preset `dev`, `clang-tidy` integrado. Recomendar extensões: clangd, cmake-tools, test-explorer.
 
 - [ ] **[P1] `Makefile` — targets de qualidade faltantes**  

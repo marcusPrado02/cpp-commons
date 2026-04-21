@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build release artifacts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install deps
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y gcc-13 g++-13 ninja-build
+
+      - name: Configure (release preset)
+        env:
+          CC: gcc-13
+          CXX: g++-13
+        run: cmake --preset release
+
+      - name: Build
+        run: cmake --build --preset release --parallel
+
+      - name: Install to staging dir
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          cmake --install build/release --prefix "dist/cpp-commons-${TAG}"
+
+      - name: Create tarball
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          tar -czf "cpp-commons-${TAG}-headers.tar.gz" \
+              -C dist "cpp-commons-${TAG}/include"
+
+      - name: Extract changelog entry
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          VER="${TAG#v}"
+          awk "/^## \[${VER}\]/{found=1; next} /^## \[/{found=0} found{print}" CHANGELOG.md \
+              > release_notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        env:
+          TAG: ${{ github.ref_name }}
+        with:
+          name: "cpp-commons ${{ github.ref_name }}"
+          body_path: release_notes.md
+          files: |
+            cpp-commons-${{ github.ref_name }}-headers.tar.gz
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-rc') || contains(github.ref_name, '-beta') || contains(github.ref_name, '-alpha') }}

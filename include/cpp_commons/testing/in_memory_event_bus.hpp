@@ -1,3 +1,5 @@
+/// @file in_memory_event_bus.hpp
+/// @brief InMemoryEventBus — thread-safe event store and dispatcher for unit tests.
 #pragma once
 #include <cpp_commons/kernel/domain_event.hpp>
 #include <functional>
@@ -9,9 +11,9 @@
 
 namespace cpp_commons::testing {
 
-// In-memory event bus for unit tests.
-// publish<E>(event) stores the event and calls any registered handlers.
-// events_of<E>() returns all published events of that type.
+/// @brief Publishes domain events to in-process subscribers and stores them for assertion.
+///
+/// Use `count<E>()` / `last<E>()` in tests; `subscribe<E>(handler)` for side-effects.
 class InMemoryEventBus {
 public:
     template <typename E>

@@ -1,3 +1,5 @@
+/// @file email.hpp
+/// @brief Validated email address value object — construction only via `Email::parse()`.
 #pragma once
 #include "value_object.hpp"
 #include <cpp_commons/kernel/result.hpp>
@@ -7,8 +9,10 @@
 
 namespace cpp_commons::kernel {
 
-// Validated email address value object.
-// Construction only via Email::parse — guarantees the invariant.
+/// @brief RFC 5322-simplified email address.
+///
+/// `parse()` enforces `local@domain.tld` structure and rejects whitespace.
+/// Returns `Result<Email, ValidationError>` so callers must handle the error path.
 class Email : public ValueObject<Email> {
 public:
     [[nodiscard]] static Result<Email, errors::ValidationError> parse(std::string_view input) {

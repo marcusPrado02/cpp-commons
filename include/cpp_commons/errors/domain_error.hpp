@@ -1,9 +1,12 @@
+/// @file domain_error.hpp
+/// @brief Exception hierarchy: DomainError / ApplicationError / InfrastructureError.
 #pragma once
 #include <stdexcept>
 #include <string>
 
 namespace cpp_commons::errors {
 
+/// @brief Base for business-rule violations (entity invariants, aggregate constraints).
 class DomainError : public std::runtime_error {
 public:
     explicit DomainError(std::string message) : std::runtime_error{message}, message_{std::move(message)} {}
@@ -24,6 +27,7 @@ class InvariantViolationError final : public DomainError {
 public: using DomainError::DomainError;
 };
 
+/// @brief Base for application-layer errors (validation, auth, rate-limiting).
 class ApplicationError : public std::runtime_error {
 public:
     explicit ApplicationError(std::string message) : std::runtime_error{message}, message_{std::move(message)} {}
@@ -52,6 +56,7 @@ class TimeoutError final : public ApplicationError {
 public: using ApplicationError::ApplicationError;
 };
 
+/// @brief Base for infrastructure errors (DB down, external service failure).
 class InfrastructureError : public std::runtime_error {
 public:
     explicit InfrastructureError(std::string message) : std::runtime_error{message}, message_{std::move(message)} {}

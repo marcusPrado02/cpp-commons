@@ -1,11 +1,15 @@
+/// @file deadline.hpp
+/// @brief Deadline — absolute time point by which an operation must complete.
 #pragma once
 #include "clock.hpp"
 #include <chrono>
 
 namespace cpp_commons::kernel {
 
-// Deadline represents an absolute point in time by which an operation must complete.
-// Passed by value — cheap to copy (just a time_point).
+/// @brief Deadline wraps a `TimePoint` and exposes `is_expired()` / `remaining()`.
+///
+/// Passed by value (16 bytes). Use `Deadline::in(ms)` for relative construction,
+/// `Deadline::never()` to express an unconditional permission.
 class Deadline {
 public:
     explicit Deadline(TimePoint at) noexcept : at_{at} {}

@@ -1,0 +1,19 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    labels: ["dependencies", "ci"]
+
+  # FetchContent dependencies — tracked as custom registries pointing to GitHub
+  # Dependabot cannot auto-update CMake FetchContent GIT_TAGs, but these entries
+  # document the pinned versions and enable manual review alerts.
+  - package-ecosystem: "git"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    ignore:
+      # Only alert when a new minor/major is available, not every patch.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]

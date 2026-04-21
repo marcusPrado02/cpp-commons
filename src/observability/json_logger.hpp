@@ -3,11 +3,13 @@
 #include "correlation_context.hpp"
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <initializer_list>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
+#include <vector>
 
 namespace cpp_commons::observability {
 
@@ -31,6 +33,18 @@ public:
     void info(std::string_view msg,  Fields fields) const;
     void warn(std::string_view msg,  Fields fields) const;
     void error(std::string_view msg, Fields fields) const;
+
+    // Set the minimum log level for this logger instance.
+    // Messages below this level are silently discarded.
+    void set_level(spdlog::level::level_enum lvl) { logger_->set_level(lvl); }
+    [[nodiscard]] spdlog::level::level_enum level() const { return logger_->level(); }
+
+    // Factory: stdout JSON sink + rotating file sink.
+    // max_size_mb: rotate when file exceeds this size. max_files: keep this many rotated files.
+    [[nodiscard]] static JsonLogger with_file(std::string service_name,
+                                              const std::string& file_path,
+                                              std::size_t max_size_mb = 100,
+                                              std::size_t max_files   = 5);
 
 private:
     std::string service_name_;

@@ -1,9 +1,15 @@
+/// @file option.hpp
+/// @brief Functional optional wrapper with monadic map/filter/value_or_else API.
 #pragma once
 #include <optional>
 #include <utility>
 
 namespace cpp_commons::kernel {
 
+/// @brief Optional value with a functional API over std::optional.
+///
+/// Prefer `Option` over raw `std::optional` when chaining transformations.
+/// Use `Option::some(val)` / `Option::none()` to construct.
 template<typename T>
 class Option {
 public:

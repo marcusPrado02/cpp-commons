@@ -1,3 +1,5 @@
+/// @file fake_logger.hpp
+/// @brief FakeLogger — in-memory LoggerPort implementation for test assertions.
 #pragma once
 #include <cpp_commons/kernel/ports/logger_port.hpp>
 #include <string>

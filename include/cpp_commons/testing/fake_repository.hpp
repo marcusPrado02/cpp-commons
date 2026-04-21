@@ -1,3 +1,5 @@
+/// @file fake_repository.hpp
+/// @brief FakeRepository — in-memory RepositoryPort implementation for unit tests.
 #pragma once
 #include <cpp_commons/kernel/ports/repository_port.hpp>
 #include <optional>
@@ -5,8 +7,9 @@
 
 namespace cpp_commons::testing {
 
-// In-memory repository for unit tests.
-// TId must be hashable (std::hash<TId> — satisfied by StrongId<Tag> and UUID).
+/// @brief Hash-map backed repository; `TId` must satisfy `std::hash<TId>`.
+///
+/// `StrongId<Tag>` and `UUID` both provide `std::hash` specialisations.
 template <typename T, typename TId>
 class FakeRepository {
 public:

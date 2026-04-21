@@ -1,3 +1,5 @@
+/// @file specification.hpp
+/// @brief DDD Specification pattern — composable boolean predicates with &&, ||, ! operators.
 #pragma once
 #include <memory>
 #include <string>
@@ -5,6 +7,9 @@
 
 namespace cpp_commons::kernel {
 
+/// @brief Abstract predicate over a domain object `T`.
+///
+/// Implement `is_satisfied_by()` in a concrete subclass, then compose via `Spec<T>`.
 template<typename T>
 class Specification {
 public:
@@ -62,7 +67,7 @@ private:
     std::shared_ptr<Specification<T>> spec_;
 };
 
-// Composable wrapper — supports &&, ||, ! operators
+/// @brief Composable wrapper over `Specification<T>` — supports `&&`, `||`, `!` operators.
 template<typename T>
 class Spec {
 public:

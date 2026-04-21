@@ -201,6 +201,20 @@ if(CPP_COMMONS_BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
 
+# ── Documentation (Doxygen) ───────────────────────────────────────────────────
+
+find_package(Doxygen QUIET)
+if(DOXYGEN_FOUND)
+    set(DOXYGEN_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/docs)
+    configure_file(Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+    add_custom_target(doc
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating API documentation with Doxygen"
+        VERBATIM
+    )
+endif()
+
 # ── Install & package config ──────────────────────────────────────────────────
 
 include(GNUInstallDirs)

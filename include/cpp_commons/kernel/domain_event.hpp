@@ -1,3 +1,5 @@
+/// @file domain_event.hpp
+/// @brief Base class for all DDD domain events with UUID identity and timestamp.
 #pragma once
 #include "clock.hpp"
 #include "identity.hpp"
@@ -5,6 +7,10 @@
 
 namespace cpp_commons::kernel {
 
+/// @brief Non-copyable base for domain events.
+///
+/// Derived classes call the protected constructor with a stable `event_type` string
+/// (e.g. `"order.placed"`). The `event_id` and `occurred_at` are assigned automatically.
 class DomainEvent {
 public:
     virtual ~DomainEvent() = default;

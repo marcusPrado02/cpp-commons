@@ -1,3 +1,5 @@
+/// @file money.hpp
+/// @brief ISO 4217 monetary value — integer cents + currency code with overflow-safe arithmetic.
 #pragma once
 #include "value_object.hpp"
 #include <cpp_commons/errors/domain_error.hpp>
@@ -10,7 +12,7 @@
 
 namespace cpp_commons::kernel {
 
-// ISO 4217 currency code (3 uppercase letters, e.g. "USD", "EUR", "BRL").
+/// @brief ISO 4217 three-letter currency code (e.g. "USD", "EUR", "BRL").
 struct CurrencyCode {
     char code[4]{};  // null-terminated 3-char string
 
@@ -27,8 +29,10 @@ struct CurrencyCode {
     bool operator!=(const CurrencyCode& o) const noexcept { return !(*this == o); }
 };
 
-// Immutable monetary value: integer cents + currency code.
-// Arithmetic operations require matching currencies and check for overflow.
+/// @brief Immutable monetary value: integer cents + ISO 4217 currency code.
+///
+/// Arithmetic operations require matching currencies and check for overflow.
+/// Use `cents()` for exact arithmetic; `to_string()` for display formatting.
 class Money : public ValueObject<Money> {
 public:
     Money(int64_t cents, CurrencyCode currency)

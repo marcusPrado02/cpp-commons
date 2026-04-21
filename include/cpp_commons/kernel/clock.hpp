@@ -1,3 +1,5 @@
+/// @file clock.hpp
+/// @brief Clock concept + SystemClock/FrozenClock implementations for testable time.
 #pragma once
 #include <chrono>
 #include <concepts>
@@ -7,11 +9,13 @@ namespace cpp_commons::kernel {
 using TimePoint = std::chrono::system_clock::time_point;
 using Duration  = std::chrono::nanoseconds;
 
+/// @brief Constraint: any type with a `now()` returning `TimePoint` satisfies `Clock`.
 template<typename T>
 concept Clock = requires(const T t) {
     { t.now() } -> std::same_as<TimePoint>;
 };
 
+/// @brief Production clock — delegates to `std::chrono::system_clock::now()`.
 class SystemClock {
 public:
     [[nodiscard]] TimePoint now() const noexcept {
@@ -20,6 +24,7 @@ public:
 };
 static_assert(Clock<SystemClock>);
 
+/// @brief Deterministic clock for unit tests — time only advances when you call `advance()`.
 class FrozenClock {
 public:
     explicit FrozenClock(TimePoint t = std::chrono::system_clock::now()) : now_{t} {}

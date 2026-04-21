@@ -1,16 +1,13 @@
+/// @file matchers.hpp
+/// @brief GTest/GMock matchers for `Result<T,E>` and `Option<T>`.
+///
+/// Usage: `EXPECT_THAT(result, IsOk())`, `EXPECT_THAT(opt, IsSomeWith(42))`.
 #pragma once
 #include <cpp_commons/kernel/result.hpp>
 #include <cpp_commons/kernel/option.hpp>
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <string>
-
-// Custom GTest matchers for cpp-commons domain types.
-// Usage:  EXPECT_THAT(result, IsOk());
-//         EXPECT_THAT(result, IsOkWith(42));
-//         EXPECT_THAT(result, IsErr());
-//         EXPECT_THAT(option, IsSome());
-//         EXPECT_THAT(option, IsNone());
 
 namespace cpp_commons::testing {
 

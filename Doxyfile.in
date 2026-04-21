@@ -1,0 +1,31 @@
+PROJECT_NAME           = "cpp-commons"
+PROJECT_NUMBER         = @PROJECT_VERSION@
+PROJECT_BRIEF          = "C++20 building blocks for microservice backends"
+OUTPUT_DIRECTORY       = @DOXYGEN_OUTPUT_DIR@
+
+INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/include
+RECURSIVE              = YES
+FILE_PATTERNS          = *.hpp
+EXCLUDE_PATTERNS       = */testing/*
+
+GENERATE_HTML          = YES
+GENERATE_LATEX         = NO
+HTML_OUTPUT            = html
+
+EXTRACT_ALL            = NO
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+ENABLE_PREPROCESSING   = YES
+MACRO_EXPANSION        = YES
+PREDEFINED             = CPP_COMMONS_HAS_OPENSSL \
+                         CPP_COMMONS_HAS_ZLIB
+
+QUIET                  = YES
+WARNINGS               = YES
+WARN_IF_UNDOCUMENTED   = NO
+
+SORT_MEMBER_DOCS       = NO
+SHOW_INCLUDE_FILES     = NO
+
+HAVE_DOT               = NO

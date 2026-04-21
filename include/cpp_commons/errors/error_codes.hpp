@@ -1,11 +1,11 @@
+/// @file error_codes.hpp
+/// @brief RFC 9457 Problem Detail type URIs and HTTP status code constants.
 #pragma once
 #include <string_view>
 
 namespace cpp_commons::errors {
 
-// Well-known Problem Detail type URIs (RFC 9457).
-// Use these as the `type` field in ProblemDetails to give errors stable,
-// linkable identities — preferable to the opaque "about:blank" default.
+/// @brief Stable URN-based type URIs for use in `ProblemDetails::type`.
 namespace error_type {
 
 inline constexpr std::string_view not_found          = "urn:cpp-commons:error:not-found";

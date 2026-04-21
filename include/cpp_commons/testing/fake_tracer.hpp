@@ -1,3 +1,5 @@
+/// @file fake_tracer.hpp
+/// @brief FakeTracer (records spans) and NoopTracer (discards) for TracerPort testing.
 #pragma once
 #include <cpp_commons/kernel/ports/tracer_port.hpp>
 #include <string>
@@ -5,7 +7,7 @@
 
 namespace cpp_commons::testing {
 
-// Records span names for assertion in tests.
+/// @brief TracerPort implementation that records span names for test assertions.
 class FakeTracer {
 public:
     void start_span(std::string_view name) { spans_.emplace_back(name); }

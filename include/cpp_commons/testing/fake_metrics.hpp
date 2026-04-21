@@ -1,3 +1,5 @@
+/// @file fake_metrics.hpp
+/// @brief NoopMetrics (discard) and SpyMetrics (capture) for MetricsPort testing.
 #pragma once
 #include <cpp_commons/kernel/ports/metrics_port.hpp>
 #include <string>
@@ -5,7 +7,7 @@
 
 namespace cpp_commons::testing {
 
-// NoopMetrics satisfies MetricsPort but discards all observations.
+/// @brief MetricsPort implementation that discards all observations.
 class NoopMetrics {
 public:
     void increment(std::string_view /*name*/)                   noexcept {}
@@ -15,7 +17,7 @@ public:
 
 static_assert(kernel::MetricsPort<NoopMetrics>);
 
-// SpyMetrics captures observations for assertion in tests.
+/// @brief MetricsPort implementation that records all observations for test assertions.
 class SpyMetrics {
 public:
     void increment(std::string_view name) {

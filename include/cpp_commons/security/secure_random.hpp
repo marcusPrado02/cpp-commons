@@ -1,3 +1,5 @@
+/// @file secure_random.hpp
+/// @brief SecureRandom — CSPRNG backed by `/dev/urandom` with URL-safe base64 output.
 #pragma once
 #include <array>
 #include <cstdint>
@@ -7,8 +9,10 @@
 
 namespace cpp_commons::security {
 
-// Generates cryptographically secure random bytes from /dev/urandom.
-// Throws std::runtime_error if the OS source is unavailable.
+/// @brief Cryptographically secure random generator using `/dev/urandom`.
+///
+/// `generate_bytes(n)` returns raw bytes; `generate_token(n)` returns a
+/// URL-safe base64url-encoded token (no padding).
 class SecureRandom {
 public:
     // Returns `byte_count` cryptographically secure random bytes.

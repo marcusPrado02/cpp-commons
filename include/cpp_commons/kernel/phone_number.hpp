@@ -1,3 +1,5 @@
+/// @file phone_number.hpp
+/// @brief E.164 phone number value object — construction only via `PhoneNumber::parse()`.
 #pragma once
 #include "value_object.hpp"
 #include <cpp_commons/kernel/result.hpp>
@@ -7,8 +9,9 @@
 
 namespace cpp_commons::kernel {
 
-// E.164 phone number: '+' followed by 7-15 digits.
-// Construction only via PhoneNumber::parse.
+/// @brief E.164-format phone number (`+` followed by 7–15 digits).
+///
+/// `parse()` validates the format and returns `Result<PhoneNumber, ValidationError>`.
 class PhoneNumber : public ValueObject<PhoneNumber> {
 public:
     [[nodiscard]] static Result<PhoneNumber, errors::ValidationError>

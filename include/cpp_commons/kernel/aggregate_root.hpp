@@ -1,3 +1,5 @@
+/// @file aggregate_root.hpp
+/// @brief DDD AggregateRoot — Entity with deferred domain event collection.
 #pragma once
 #include "domain_event.hpp"
 #include "entity.hpp"
@@ -7,6 +9,10 @@
 
 namespace cpp_commons::kernel {
 
+/// @brief DDD aggregate root that accumulates domain events.
+///
+/// Call `record()` in command methods to enqueue events; call `pull_events()`
+/// in the application layer (after persistence) to dispatch them.
 template<EntityIdentifier TId>
 class AggregateRoot : public Entity<TId> {
 public:

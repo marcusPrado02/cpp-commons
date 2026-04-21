@@ -1,11 +1,12 @@
+/// @file builders.hpp
+/// @brief Fluent `Builder<T>` for constructing test objects via lambda steps.
 #pragma once
 #include <functional>
 #include <vector>
 
 namespace cpp_commons::testing {
 
-// Fluent builder for constructing test objects.
-// Usage: auto order = Builder<Order>{}.with([](Order& o){ o.status = PENDING; }).build();
+/// @brief Fluent builder: chain `with([](T& o){…})` calls, then `build()`.
 template<typename T>
 class Builder {
 public:
