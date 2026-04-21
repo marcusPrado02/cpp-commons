@@ -1,4 +1,5 @@
 #include <settings.hpp>
+#include <env_source.hpp>
 #include <gtest/gtest.h>
 
 using namespace cpp_commons::config;
@@ -140,4 +141,35 @@ TEST(ConfigValidatorTest, RequireDurationAggregatesOnBadSuffix) {
     v.require_duration("CPP_COMMONS_V_TTL");
     EXPECT_TRUE(v.has_errors());
     ::unsetenv("CPP_COMMONS_V_TTL");
+}
+
+// ── EnvSource prefix ─────────────────────────────────────────────────────────
+
+TEST(EnvSourcePrefixTest, NoPrefixReadsDirect) {
+    ::setenv("CPP_COMMONS_EP_HOST", "direct", 1);
+    EnvSource src;
+    EXPECT_EQ(src.get("CPP_COMMONS_EP_HOST"), "direct");
+    ::unsetenv("CPP_COMMONS_EP_HOST");
+}
+
+TEST(EnvSourcePrefixTest, PrefixPrependedToKey) {
+    ::setenv("APP_PORT", "9090", 1);
+    EnvSource src{"APP_"};
+    EXPECT_EQ(src.prefix(), "APP_");
+    EXPECT_EQ(src.get("PORT"), "9090");
+    ::unsetenv("APP_PORT");
+}
+
+TEST(EnvSourcePrefixTest, UnprefixedKeyNotFound) {
+    ::unsetenv("PORT");
+    ::setenv("APP_PORT", "9090", 1);
+    EnvSource src{"APP_"};
+    EXPECT_EQ(src.get("APP_PORT"), std::nullopt);  // double-prefix not set
+    ::unsetenv("APP_PORT");
+}
+
+TEST(EnvSourcePrefixTest, ReturnsNulloptForMissingKey) {
+    ::unsetenv("APP_MISSING");
+    EnvSource src{"APP_"};
+    EXPECT_EQ(src.get("MISSING"), std::nullopt);
 }
