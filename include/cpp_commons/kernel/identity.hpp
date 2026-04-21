@@ -30,6 +30,7 @@ public:
     }
 
     // Parse "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx". Returns nullopt on any error.
+    // NOLINTNEXTLINE(readability-function-cognitive-complexity)
     [[nodiscard]] static std::optional<UUID> from_string(std::string_view s) noexcept {
         // Fixed layout: 8-4-4-4-12 hex digits + 4 dashes = 36 chars
         if (s.size() != 36)
@@ -89,6 +90,7 @@ public:
     bool operator<(const UUID& o) const { return hi_ != o.hi_ ? hi_ < o.hi_ : lo_ < o.lo_; }
 
 private:
+    // NOLINTNEXTLINE(bugprone-easily-swappable-parameters)
     UUID(uint64_t hi, uint64_t lo) : hi_{hi}, lo_{lo} {}
     uint64_t hi_{};
     uint64_t lo_{};

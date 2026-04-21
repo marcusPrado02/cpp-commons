@@ -40,6 +40,7 @@ std::string sha256(std::string_view msg) {
     for (unsigned i = 0; i < 8; ++i)
         padded += static_cast<char>((bit_len >> ((7u - i) * 8u)) & 0xFFu);
 
+    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-constant-array-index)
     for (std::size_t chunk = 0; chunk < padded.size(); chunk += 64) {
         std::array<uint32_t, 64> w{};
         for (std::size_t i = 0; i < 16; ++i) {
@@ -81,6 +82,7 @@ std::string sha256(std::string_view msg) {
         h6 += g;
         h7 += h;
     }
+    // NOLINTEND(cppcoreguidelines-pro-bounds-constant-array-index)
 
     std::string digest(32, '\0');
     auto put = [&](std::size_t off, uint32_t v) {

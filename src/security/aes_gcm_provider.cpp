@@ -28,6 +28,7 @@ std::vector<uint8_t> AesGcmProvider::encrypt(std::string_view plaintext) const {
     EVP_EncryptInit_ex(ctx, nullptr, nullptr, key_.data(), out.data());
 
     int len = 0;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     EVP_EncryptUpdate(ctx, out.data() + kIvLen, &len,
                       reinterpret_cast<const uint8_t*>(plaintext.data()),
                       static_cast<int>(plaintext.size()));
@@ -43,6 +44,7 @@ std::string AesGcmProvider::decrypt(const std::vector<uint8_t>& ciphertext) cons
     static constexpr int kIvLen = 12;
     static constexpr int kTagLen = 16;
 
+    // NOLINTNEXTLINE(bugprone-misplaced-widening-cast)
     if (ciphertext.size() < static_cast<std::size_t>(kIvLen + kTagLen))
         throw EncryptionError{"ciphertext too short"};
 
@@ -55,14 +57,17 @@ std::string AesGcmProvider::decrypt(const std::vector<uint8_t>& ciphertext) cons
     EVP_DecryptInit_ex(ctx, nullptr, nullptr, key_.data(), ciphertext.data());
 
     int len = 0;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     EVP_DecryptUpdate(ctx, reinterpret_cast<uint8_t*>(plaintext.data()), &len,
                       ciphertext.data() + kIvLen, static_cast<int>(ct_len));
 
     // Set expected tag
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
     auto* tag_ptr = const_cast<uint8_t*>(ciphertext.data() + kIvLen + ct_len);
     EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, kTagLen, tag_ptr);
 
     int final_len = 0;
+    // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
     int ok =
         EVP_DecryptFinal_ex(ctx, reinterpret_cast<uint8_t*>(plaintext.data()) + len, &final_len);
     EVP_CIPHER_CTX_free(ctx);
