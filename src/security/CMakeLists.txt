@@ -3,6 +3,7 @@ add_library(cpp_commons::security ALIAS cpp_commons_security)
 
 target_sources(cpp_commons_security PRIVATE
     jwt_decoder.cpp
+    jwt_signer.cpp
     aes_gcm_provider.cpp
     api_key.cpp
     pii_redactor.cpp
