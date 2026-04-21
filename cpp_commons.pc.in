@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: cpp-commons
+Description: Production-ready C++20 building blocks for microservice backends
+Version: @PROJECT_VERSION@
+Requires:
+Cflags: -I${includedir} -std=c++20
+Libs: -L${libdir} -lcpp_commons_kernel -lcpp_commons_observability -lcpp_commons_resilience -lcpp_commons_web -lcpp_commons_security -lcpp_commons_config -lcpp_commons_application -lcpp_commons_errors -lcpp_commons_testing

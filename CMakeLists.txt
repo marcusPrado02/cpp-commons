@@ -242,3 +242,8 @@ install(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/CppCommonsConfigVersion.cmake
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cpp_commons
 )
+
+configure_file(cpp_commons.pc.in cpp_commons.pc @ONLY)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cpp_commons.pc
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+)
