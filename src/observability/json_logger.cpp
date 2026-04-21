@@ -57,19 +57,13 @@ void JsonLogger::error(std::string_view msg, Fields f) const {
 
 void JsonLogger::log(spdlog::level::level_enum lvl, std::string_view msg, Fields fields) const {
     const auto& ctx = current_correlation();
-    std::string entry = R"({"msg":")";
-    entry += msg;
-    entry += '"';
+    std::string entry = std::format(R"({{"msg":"{}")", msg);
     if (!ctx.empty()) {
-        entry += std::format(",\"cid\":\"{}\",\"tid\":\"{}\",\"rid\":\"{}\"", ctx.correlation_id,
+        entry += std::format(R"(,"cid":"{}","tid":"{}","rid":"{}")", ctx.correlation_id,
                              ctx.tenant_id, ctx.request_id);
     }
     for (const auto& [k, v] : fields) {
-        entry += ",\"";
-        entry += k;
-        entry += "\":\"";
-        entry += v;
-        entry += '"';
+        entry += std::format(R"(,"{}":"{}")", k, v);
     }
     entry += '}';
     logger_->log(lvl, entry);
@@ -80,8 +74,9 @@ JsonLogger JsonLogger::with_file(std::string service_name, const std::string& fi
                                  std::size_t max_size_mb, std::size_t max_files) {
     // NOLINTEND(bugprone-easily-swappable-parameters)
     auto stdout_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+    static constexpr std::size_t kBytesPerMb = 1024UZ * 1024UZ;
     auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(
-        file_path, max_size_mb * 1024 * 1024, max_files);
+        file_path, max_size_mb * kBytesPerMb, max_files);
     auto logger = std::make_shared<spdlog::logger>(service_name,
                                                    spdlog::sinks_init_list{stdout_sink, file_sink});
     logger->set_pattern(R"({"ts":"%Y-%m-%dT%H:%M:%S.%e","level":"%l","svc":"%n","msg":"%v"})");
