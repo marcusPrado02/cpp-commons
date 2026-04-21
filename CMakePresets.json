@@ -28,7 +28,30 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE":              "Release",
         "CPP_COMMONS_BUILD_TESTS":       "ON",
+        "CPP_COMMONS_ENABLE_SANITIZERS": "undefined"
+      }
+    },
+    {
+      "name": "ci-asan",
+      "displayName": "CI ASan (Debug + Address + tests)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/ci-asan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE":              "Debug",
+        "CPP_COMMONS_BUILD_TESTS":       "ON",
         "CPP_COMMONS_ENABLE_SANITIZERS": "address"
+      }
+    },
+    {
+      "name": "coverage",
+      "displayName": "Coverage (Debug + gcov)",
+      "inherits": "base",
+      "binaryDir": "${sourceDir}/build/coverage",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE":        "Debug",
+        "CPP_COMMONS_BUILD_TESTS": "ON",
+        "CMAKE_CXX_FLAGS":         "--coverage -fprofile-abs-path",
+        "CMAKE_EXE_LINKER_FLAGS":  "--coverage"
       }
     },
     {
@@ -56,6 +79,8 @@
   "buildPresets": [
     { "name": "dev",       "configurePreset": "dev"       },
     { "name": "ci",        "configurePreset": "ci"        },
+    { "name": "ci-asan",   "configurePreset": "ci-asan"   },
+    { "name": "coverage",  "configurePreset": "coverage"  },
     { "name": "release",   "configurePreset": "release"   },
     { "name": "benchmark", "configurePreset": "benchmark" }
   ],
@@ -69,6 +94,18 @@
     {
       "name": "ci",
       "configurePreset": "ci",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error" }
+    },
+    {
+      "name": "ci-asan",
+      "configurePreset": "ci-asan",
+      "output": { "outputOnFailure": true },
+      "execution": { "noTestsAction": "error" }
+    },
+    {
+      "name": "coverage",
+      "configurePreset": "coverage",
       "output": { "outputOnFailure": true },
       "execution": { "noTestsAction": "error" }
     }
