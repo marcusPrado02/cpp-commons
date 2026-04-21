@@ -2,6 +2,7 @@ add_executable(config_tests
     settings_test.cpp
     dotenv_source_test.cpp
     yaml_source_test.cpp
+    config_watcher_test.cpp
 )
 target_include_directories(config_tests PRIVATE
     ${CMAKE_SOURCE_DIR}/src/config
