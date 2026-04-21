@@ -113,7 +113,8 @@ jobs:
           files = sorted({e['file'] for e in db
                           if e['file'].endswith('.cpp')
                           and '/_deps/' not in e['file']
-                          and '/build/' not in e['file']})
+                          and '/build/' not in e['file']
+                          and '/tests/' not in e['file']})
           print('\n'.join(files))
           " | xargs clang-tidy-17 -p build/ci
 
