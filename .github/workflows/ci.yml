@@ -136,7 +136,8 @@ jobs:
                --ignore-errors mismatch,negative
           lcov --remove coverage.info \
                '*/build/_deps/*' '/usr/*' \
-               --output-file coverage.filtered.info
+               --output-file coverage.filtered.info \
+               --ignore-errors unused
       - name: Enforce 80% line coverage
         run: |
           pct=$(lcov --summary coverage.filtered.info 2>&1 \

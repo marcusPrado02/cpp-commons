@@ -25,7 +25,7 @@ TEST(QueryBusTest, DispatchesRegisteredHandler) {
 
 TEST(QueryBusTest, ThrowsWhenNoHandlerRegistered) {
     QueryBus bus;
-    EXPECT_THROW(bus.query<UserDto>(GetUser{1}), QueryNotRegistered);
+    EXPECT_THROW((void)bus.query<UserDto>(GetUser{1}), QueryNotRegistered);
 }
 
 TEST(QueryBusTest, MultipleHandlersCoexist) {
